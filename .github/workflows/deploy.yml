@@ -29,7 +29,14 @@ jobs:
           java-version: '17'
 
       - name: Build KMP Project
-        run: ./gradlew :composeApp:wasmJsBrowserProductionWebpack
+        run: |
+          modules=(${{ env.MODULES }})
+          for module in "${modules[@]}"; do
+          (
+            echo "Building in $subfolder"
+            cd "$module" && ./gradlew :composeApp:wasmJsBrowserProductionWebpack
+          ) &
+          done
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -43,6 +50,6 @@ jobs:
           modules=(${{ env.MODULES }})
           for module in "${modules[@]}"; do
             version=$(grep '^version=' $module/gradle.properties | awk -F= '{print $2}')
-            docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/eclipse-lmos/$module:$version $module
-            docker push ghcr.io/eclipse-lmos/$module:$version
+            docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/sk-ai-net/samples-$module:$version $module
+            docker push ghcr.io/sk-ai-net/samples-$module:$version
           done

@@ -7,6 +7,9 @@ on:
     branches:
       - main  # Change this to your default branch if different
 
+env:
+  MODULES: "SinusApproximator"          
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,4 +24,11 @@ jobs:
           java-version: '17'
 
       - name: Build KMP Project
-        run: ./gradlew assemble
+        run: |
+          modules=(${{ env.MODULES }})
+          for module in "${modules[@]}"; do
+          (
+            echo "Building in $subfolder"
+            cd "$module" && ./gradlew build
+          ) &
+          done
