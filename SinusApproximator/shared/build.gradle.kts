@@ -33,27 +33,26 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
         browser {
+            val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
+                        add(rootDirPath)
                         add(projectDirPath)
                     }
                 }
             }
         }
-        binaries.executable()
     }
 
     sourceSets {
         commonMain.dependencies {
             implementation(libs.skainet.core)
             implementation(libs.skainet.io)
-            implementation(libs.okio)
+            implementation(libs.kotlinx.io.core)
         }
     }
 }

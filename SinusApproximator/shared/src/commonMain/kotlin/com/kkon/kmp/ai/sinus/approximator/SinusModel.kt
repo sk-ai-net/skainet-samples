@@ -5,6 +5,7 @@ import sk.ai.net.Tensor
 import sk.ai.net.dsl.network
 import sk.ai.net.impl.DoublesTensor
 import sk.ai.net.nn.Module
+import sk.ai.net.nn.activations.ReLU
 
 
 interface SinusCalculator {
@@ -18,10 +19,10 @@ class SineNN(override val name: String = "sin") : Module() {
     private val sineModule = network {
         input(1)
         dense(16) {
-            activation = { it }
+            activation = ReLU()::forward
         }
         dense(16) {
-            activation = { it }
+            activation = ReLU()::forward
         }
         dense(1)
     }

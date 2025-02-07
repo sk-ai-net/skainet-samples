@@ -1,15 +1,14 @@
-package com.kkon.kmp.ai.sinus.approximator
+package sk.ai.net.samples.kmp.sinus.approximator
 
-import SinusSliderScreen
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import okio.BufferedSource
+import kotlinx.io.Source
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 @Composable
 @Preview
-fun App(handleSource: () -> BufferedSource) {
+fun App(handleSource: () -> Source) {
     MaterialTheme {
         SinusSliderScreen(handleSource)
     }

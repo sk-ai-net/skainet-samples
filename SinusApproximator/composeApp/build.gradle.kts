@@ -26,12 +26,14 @@ kotlin {
     wasmJs {
         moduleName = "composeApp"
         browser {
+            val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
+                        add(rootDirPath)
                         add(projectDirPath)
                     }
                 }
@@ -39,7 +41,6 @@ kotlin {
         }
         binaries.executable()
     }
-
     sourceSets {
         val desktopMain by getting
 
@@ -48,7 +49,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(libs.okio)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
@@ -59,15 +60,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
 
+            implementation(libs.kotlinx.io.core)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
-
-            // dependencies from maven local repository
-            // implementation("sk.ai.net:core:0.0.2")
-            //implementation("sk.ai.net:reflection:0.0.1")
-
         }
     }
 }
@@ -81,7 +79,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.kkon.kmp.ai.sinus.approximator"
+        applicationId = "sk.ai.net.samples.kmp.sinus.approximator"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -111,7 +109,7 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "com.kkon.kmp.ai.sinus.approximator.MainKt"
+        mainClass = "sk.ai.net.samples.kmp.sinus.approximator.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

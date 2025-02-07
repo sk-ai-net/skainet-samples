@@ -1,3 +1,5 @@
+package sk.ai.net.samples.kmp.sinus.approximator
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -5,12 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kkon.kmp.ai.sinus.approximator.ASinusCalculator
 import kotlinx.coroutines.launch
-import okio.BufferedSource
+import kotlinx.io.Source
 import kotlin.math.PI
 import kotlin.math.sin
 
 @Composable
-fun SinusSliderScreen(handleSource: () -> BufferedSource) {
+fun SinusSliderScreen(handleSource: () -> Source) {
     // State für den Sliderwert (0 bis PI/2)
     var sliderValue by remember { mutableStateOf(0f) }
 

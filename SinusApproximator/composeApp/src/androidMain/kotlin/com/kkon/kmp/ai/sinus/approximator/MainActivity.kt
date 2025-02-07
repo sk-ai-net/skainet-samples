@@ -1,12 +1,13 @@
 package com.kkon.kmp.ai.sinus.approximator
 
-import android.R
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import okio.buffer
-import okio.source
+import kotlinx.io.asSource
+import sk.ai.net.samples.kmp.sinus.approximator.App
 import java.io.InputStream
+import kotlinx.io.buffered
+
 
 
 class MainActivity : ComponentActivity() {
@@ -19,13 +20,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             inputStream?.let {
                 App {
-                    it.source().buffer()
+                    it.asSource().buffered()
                 }
             }
         }
-    }
-
-    fun getAsset(name: String): InputStream? {
-        return assets.open(name)
     }
 }
