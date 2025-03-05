@@ -10,6 +10,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App(handleSource: () -> Source) {
     MaterialTheme {
-        SinusSliderScreen(handleSource)
+        DrawingScreen(handleSource)
     }
 }
