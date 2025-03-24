@@ -21,10 +21,7 @@ jobs:
 
       - name: Build all projects
         run: |
-          for dir in $(find . -type d -exec test -f {}/build.gradle -a -f {}/gradlew \; -print | grep -v '\./'); do
-            echo "Building $dir"
-            cd "$dir" || exit 1
-            chmod +x gradlew
-            ./gradlew build || echo "Build failed for $dir, continuing..."
-            cd - || exit 1
-          done
+           ls
+           cd SinusApproximator
+           ./gradlew assemble
+           cd ..
