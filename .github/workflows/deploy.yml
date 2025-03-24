@@ -33,7 +33,7 @@ jobs:
           modules=(${{ env.MODULES }})
           for module in "${modules[@]}"; do
           (
-            echo "Building in $subfolder"
+            echo "Building in $module"
             cd "$module" && ./gradlew :composeApp:wasmJsBrowserProductionWebpack
           ) &
           done
@@ -49,6 +49,9 @@ jobs:
         run: |
           modules=(${{ env.MODULES }})
           for module in "${modules[@]}"; do
+            echo "Building module: $module"
+            module_lc="${module,,}"
+
             version=$(grep '^version=' $module/gradle.properties | awk -F= '{print $2}')
             module_lc="${module,,}"
             docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/sk-ai-net/samples-$module_lc:$version $module
