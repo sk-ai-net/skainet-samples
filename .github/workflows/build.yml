@@ -26,9 +26,10 @@ jobs:
       - name: Build KMP Project
         run: |
           modules=(${{ env.MODULES }})
+          echo "All modules $module"
           for module in "${modules[@]}"; do
           (
-            echo "Building in $subfolder"
+            echo "Building in $module"
             cd "$module" && ./gradlew build
           ) &
           done
