@@ -53,3 +53,45 @@ jobs:
             docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/sk-ai-net/samples-$module:$version $module
             docker push ghcr.io/sk-ai-net/samples-$module:$version
           done
+
+      - name: Build and publish WASM images for modules
+        run: |
+          modules=(${{ env.MODULES }})
+          for module in "${modules[@]}"; do
+            echo "Building module: $module"
+
+            # Extract module version from gradle.properties
+            version=$(grep '^version=' "$module/gradle.properties" | awk -F= '{print $2}' | tr -d '[:space:]')
+            echo "Detected version: $version"
+
+            # Build wasm binary for the current module
+            ./gradlew :$module:wasmJsBrowserProductionWebpack
+
+            # Assume WASM binary is located at a standard path, adjust if necessary:
+            WASM_PATH="$module/build/dist/wasmJs/productionExecutable/$module.wasm"
+            if [ ! -f "$WASM_PATH" ]; then
+              echo "WASM binary not found at $WASM_PATH"
+              exit 1
+            fi
+
+            # Create temporary Dockerfile for WASM packaging
+            cat <<EOF > Dockerfile.wasm
+          FROM scratch
+          COPY $module.wasm /app/$module.wasm
+          EOF
+
+            # Copy wasm binary to build context
+            cp "$WASM_PATH" "./$module.wasm"
+
+            # Build and push OCI image to GHCR
+            docker buildx build \
+              --platform=wasi/wasm32 \
+              --tag ghcr.io/${{ github.repository }}/$module-wasm:$version \
+              --tag ghcr.io/${{ github.repository }}/$module-wasm:latest \
+              --push .
+
+            # Cleanup temporary files
+            rm Dockerfile.wasm "$module.wasm"
+
+            echo "Successfully pushed ghcr.io/${{ github.repository }}/$module-wasm:$version"
+          done
