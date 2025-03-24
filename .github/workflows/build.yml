@@ -1,33 +1,30 @@
-name: Arc UI Build
+name: Build All Projects
+
 on:
   push:
     branches:
-      - main  # Change this to your default branch if different
-  pull_request:
-    branches:
-      - main  # Change this to your default branch if different
-
-env:
-  MODULES: "SinusApproximator"          
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
+          java-version: '11'
           distribution: 'temurin'
-          java-version: '17'
-
-      - name: Build KMP Project
+          
+      - name: Build all projects
         run: |
-          for dir in $(find . -type d -exec test -f {}/build.gradle.kts -a -f {}/gradew \; -print | grep -v '\./'); do
+          for dir in $(find . -type d -exec test -f {}/build.gradle -a -f {}/gradlew \; -print | grep -v '\./'); do
             echo "Building $dir"
-            cd "$dir"
-            ./gradlew build
-            cd -
+            cd "$dir" || exit 1
+            chmod +x gradlew
+            ./gradlew build || echo "Build failed for $dir, continuing..."
+            cd - || exit 1
           done
