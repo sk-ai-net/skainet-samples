@@ -50,8 +50,9 @@ jobs:
           modules=(${{ env.MODULES }})
           for module in "${modules[@]}"; do
             version=$(grep '^version=' $module/gradle.properties | awk -F= '{print $2}')
-            docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/sk-ai-net/samples-$module:$version $module
-            docker push ghcr.io/sk-ai-net/samples-$module:$version
+            module_lc="${module,,}"
+            docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/sk-ai-net/samples-$module_lc:$version $module
+            docker push ghcr.io/sk-ai-net/samples-$module_lc:$version
           done
 
       - name: Build and publish WASM images for modules
@@ -59,6 +60,9 @@ jobs:
           modules=(${{ env.MODULES }})
           for module in "${modules[@]}"; do
             echo "Building module: $module"
+            module_lc="${module,,}"
+            echo "With safe name: $module_lc"
+
 
             # Extract module version from gradle.properties
             version=$(grep '^version=' "$module/gradle.properties" | awk -F= '{print $2}' | tr -d '[:space:]')
@@ -83,15 +87,17 @@ jobs:
             # Copy wasm binary to build context
             cp "$WASM_PATH" "./$module.wasm"
 
+
+
             # Build and push OCI image to GHCR
             docker buildx build \
               --platform=wasi/wasm32 \
-              --tag ghcr.io/${{ github.repository }}/$module-wasm:$version \
-              --tag ghcr.io/${{ github.repository }}/$module-wasm:latest \
+              --tag ghcr.io/${{ github.repository }}/$module_lc-wasm:$version \
+              --tag ghcr.io/${{ github.repository }}/$module_lc-wasm:latest \
               --push .
 
             # Cleanup temporary files
             rm Dockerfile.wasm "$module.wasm"
 
-            echo "Successfully pushed ghcr.io/${{ github.repository }}/$module-wasm:$version"
+            echo "Successfully pushed ghcr.io/${{ github.repository }}/$module_lc-wasm:$version"
           done
