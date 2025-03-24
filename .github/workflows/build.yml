@@ -25,11 +25,9 @@ jobs:
 
       - name: Build KMP Project
         run: |
-          modules=(${{ env.MODULES }})
-          echo "All modules $module"
-          for module in "${modules[@]}"; do
-          (
-            echo "Building in $module"
-            cd "$module" && ./gradlew build
-          ) &
+          for dir in $(find . -type d -exec test -f {}/build.gradle.kts -a -f {}/gradew \; -print | grep -v '\./'); do
+            echo "Building $dir"
+            cd "$dir"
+            ./gradlew build
+            cd -
           done
