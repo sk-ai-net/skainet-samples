@@ -25,7 +25,13 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        mavenLocal()
+        maven {
+            url = uri("https://maven.pkg.github.com/sk-ai-net/skainet")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orElse(providers.environmentVariable("GITHUB_USERNAME")).get()
+                password = providers.gradleProperty("gpr.key").orElse(providers.environmentVariable("GITHUB_TOKEN")).get()
+            }
+        }
     }
 }
 
