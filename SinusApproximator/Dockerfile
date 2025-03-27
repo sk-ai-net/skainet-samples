@@ -4,14 +4,18 @@
 ARG GITHUB_ACTOR
 ARG GITHUB_TOKEN
 
-FROM gradle:8.9-jdk17 AS build
+# Set environment variables (optional, if needed by your gradle build)
+ENV GITHUB_ACTOR=${GITHUB_ACTOR}
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+
+FROM gradle:8.10-jdk17 AS build
 WORKDIR /app
 
 # Copy the Gradle files and source
 COPY . .
 
 # Build the web distribution
-RUN gradle :composeApp:wasmJsBrowserProductionWebpack --no-daemon
+RUN ./gradlew --info --stacktrace :composeApp:wasmJsBrowserProductionWebpack --no-daemon
 
 # =========== RUNTIME STAGE ===========
 FROM nginx:latest
