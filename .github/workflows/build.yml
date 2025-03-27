@@ -24,6 +24,9 @@ jobs:
           distribution: 'temurin'
 
       - name: Build all projects
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
            ls
            cd SinusApproximator
