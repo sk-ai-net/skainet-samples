@@ -4,11 +4,12 @@
 ARG GITHUB_ACTOR
 ARG GITHUB_TOKEN
 
+FROM gradle:8.10-jdk17 AS build
+
 # Set environment variables (optional, if needed by your gradle build)
 ENV GITHUB_ACTOR=${GITHUB_ACTOR}
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
-FROM gradle:8.10-jdk17 AS build
 WORKDIR /app
 
 # Copy the Gradle files and source
