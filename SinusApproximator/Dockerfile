@@ -15,8 +15,6 @@ WORKDIR /app
 COPY . .
 
 # Build the web distribution
-RUN echo =====
-RUN echo $GITHUB_ACTOR
 RUN ./gradlew --info :composeApp:wasmJsBrowserProductionWebpack --no-daemon
 
 # =========== RUNTIME STAGE ===========
