@@ -13,7 +13,6 @@ env:
   REGISTRY_USERNAME: ${{ github.actor }}
   REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   REGISTRY_NAMESPACE: sk-ai-net
-  MODULES: "SinusApproximator"    
 
 jobs:
   build:
@@ -33,16 +32,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build KMP Project
+      - name: Build WASM target
         run: |
-          modules=(${{ env.MODULES }})
-          for module in "${modules[@]}"; do
-          (
-            echo "Building in $module"
-            cd "$module" && ./gradlew :composeApp:wasmJsBrowserProductionWebpack
-          ) &
+          for dir in */ ; do
+            # Check if the directory contains a build.gradle.kts file
+            if [ -f "${dir}build.gradle.kts" ]; then
+              echo "==> Building project in directory: ${dir}"
+              (
+                cd "$dir" || exit 1
+                ./gradlew clean :composeApp:wasmJsBrowserProductionWebpack
+              )
+            else
+              echo "Skipping ${dir} (no build.gradle.kts found)"
+            fi
           done
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -50,65 +53,29 @@ jobs:
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Docker image
+      - name: Build and Push Docker image with wasm web app
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          modules=(${{ env.MODULES }})
-          for module in "${modules[@]}"; do
-            echo "Building module: $module"
-            module_lc="${module,,}"
-
-            version=$(grep '^version=' $module/gradle.properties | awk -F= '{print $2}')
-            module_lc="${module,,}"
-            docker build --build-arg VERSION=$version -f $module/Dockerfile -t ghcr.io/sk-ai-net/samples-$module_lc:$version $module
-            docker push ghcr.io/sk-ai-net/samples-$module_lc:$version
-          done
-
-      - name: Build and publish WASM images for modules
-        run: |
-          modules=(${{ env.MODULES }})
-          for module in "${modules[@]}"; do
-            echo "Building module: $module"
-            module_lc="${module,,}"
-            echo "With safe name: $module_lc"
-
-
-            # Extract module version from gradle.properties
-            version=$(grep '^version=' "$module/gradle.properties" | awk -F= '{print $2}' | tr -d '[:space:]')
-            echo "Detected version: $version"
-
-            # Build wasm binary for the current module
-            ./gradlew :$module:wasmJsBrowserProductionWebpack
-
-            # Assume WASM binary is located at a standard path, adjust if necessary:
-            WASM_PATH="$module/build/dist/wasmJs/productionExecutable/$module.wasm"
-            if [ ! -f "$WASM_PATH" ]; then
-              echo "WASM binary not found at $WASM_PATH"
-              exit 1
+          # Iterate through each subdirectory in the current directory
+          for dir in */ ; do
+            # Check if the directory contains a Dockerfile
+            if [ -f "${dir}Dockerfile" ]; then
+              # Extract version from gradle.properties if exists
+              version="latest"
+              if [ -f "${dir}gradle.properties" ]; then
+                version=$(grep '^version=' "${dir}gradle.properties" | cut -d'=' -f2)
+              fi
+              # Convert directory name to lowercase and remove trailing slash
+              imagename=$(echo "${dir%/}" | tr '[:upper:]' '[:lower:]')
+              echo "==> Building Docker image '${imagename}' from directory: ${dir}"
+              (
+                  cd "$dir" || exit 1
+                  docker build --build-arg VERSION=$version -t ghcr.io/sk-ai-net/samples-$imagename:$version .
+                  docker push ghcr.io/sk-ai-net/samples-$imagename:$version
+              )
+            else
+              echo "Skipping ${dir} (no Dockerfile found)"
             fi
-
-            # Create temporary Dockerfile for WASM packaging
-            cat <<EOF > Dockerfile.wasm
-          FROM scratch
-          COPY $module.wasm /app/$module.wasm
-          EOF
-
-            # Copy wasm binary to build context
-            cp "$WASM_PATH" "./$module.wasm"
-
-
-
-            # Build and push OCI image to GHCR
-            docker buildx build \
-              --platform=wasi/wasm32 \
-              --tag ghcr.io/${{ github.repository }}/$module_lc-wasm:$version \
-              --tag ghcr.io/${{ github.repository }}/$module_lc-wasm:latest \
-              --push .
-
-            # Cleanup temporary files
-            rm Dockerfile.wasm "$module.wasm"
-
-            echo "Successfully pushed ghcr.io/${{ github.repository }}/$module_lc-wasm:$version"
           done
