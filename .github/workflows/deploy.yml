@@ -77,7 +77,7 @@ jobs:
                   cd "$dir" || exit 1
                   docker build \
                       --build-arg GITHUB_ACTOR=${{ github.actor }} \
-                      --build-arg VERSION=$version
+                      --build-arg VERSION=$version \
                       --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
                       -t ghcr.io/sk-ai-net/samples-$imagename:$version .         
                   docker push ghcr.io/sk-ai-net/samples-$imagename:$version
