@@ -79,7 +79,7 @@ jobs:
                       --build-arg GITHUB_ACTOR=${{ github.actor }} \
                       --build-arg VERSION=$version
                       --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
-                      -t ghcr.io/sk-ai-net/samples-$imagename:$version           
+                      -t ghcr.io/sk-ai-net/samples-$imagename:$version .         
                   docker push ghcr.io/sk-ai-net/samples-$imagename:$version
               )
             else
