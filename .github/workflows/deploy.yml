@@ -75,6 +75,7 @@ jobs:
               echo "==> Building Docker image '${imagename}' from directory: ${dir}"
               (
                   cd "$dir" || exit 1
+                  echo GITHUB_ACTOR=$GITHUB_ACTOR
                   docker build \
                       --build-arg GITHUB_ACTOR="$GITHUB_ACTOR" \
                       --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" \
