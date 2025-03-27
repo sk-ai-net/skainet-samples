@@ -1,4 +1,9 @@
 # =========== BUILD STAGE ===========
+
+# Define build arguments
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
+
 FROM gradle:8.9-jdk17 AS build
 WORKDIR /app
 
