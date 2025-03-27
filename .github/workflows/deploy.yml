@@ -33,6 +33,9 @@ jobs:
           java-version: '17'
 
       - name: Build WASM target
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for dir in */ ; do
             # Check if the directory contains a build.gradle.kts file
