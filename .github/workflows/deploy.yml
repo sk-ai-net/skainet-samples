@@ -6,7 +6,8 @@ name: Publish
 
 on:
   push:
-    branches: ["main"]
+    tags:
+      - '*' # Push events to matching *, i.e. 1.0, 20.15.10
 
 env:
   REGISTRY_URL: ghcr.io
