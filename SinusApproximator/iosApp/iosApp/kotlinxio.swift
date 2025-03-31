@@ -89,13 +89,25 @@ class KotlinInputStream: Kotlinx_io_coreSource {
             read = inputStream.read(bM, maxLength: Int(byteCount))
         }
         let byteArray = data.kotlinByteArray
-        let buffer = Kotlinx_io_coreBuffer()
-        buffer.write(source: byteArray, startIndex: 0, endIndex: Int32(read))
+        self.buffer.write(source: byteArray, startIndex: 0, endIndex: Int32(read))
         sink.write(source: buffer, byteCount: Int64(read))
     }
     
     func request(byteCount: Int64) -> Bool {
-        fatalError("Not implemented")
+        
+        debugPrint("Requesting \(byteCount) bytes")
+        
+        var data = Data(count: Int(byteCount))
+        var read = 0
+        withUnsafeMutableBytes(of: &data) { (ptr: UnsafeMutableRawBufferPointer) in
+            guard let bM: UnsafeMutablePointer<UInt8> = ptr.bindMemory(to: UInt8.self).baseAddress else {
+                return
+            }
+            read = inputStream.read(bM, maxLength: Int(byteCount))
+        }
+        let byteArray = data.kotlinByteArray
+        self.buffer.write(source: byteArray, startIndex: 0, endIndex: Int32(read))
+        return read == byteCount
     }
     
     func require(byteCount: Int64) {
