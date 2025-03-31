@@ -7,10 +7,13 @@ struct ContentView: View {
     let kIx = Kotlinx_io_coreBuffer()
     let y:Kotlinx_io_coreSource? = nil
     let sineCalc = ASinusCalculator {
-        guard let dataURL = Bundle.main.url(forResource: "sinus", withExtension: "json"), let input = InputStream(url: dataURL) else {
+        guard let dataURL = Bundle.main.url(forResource: "sinus", withExtension: "json") else {
             fatalError("Could not load model")
         }
-        return KotlinInputStream(input)
+        let data = try! Data(contentsOf: dataURL)
+        let buffer = Kotlinx_io_coreBuffer()
+        buffer.write(source: data.kotlinByteArray, startIndex: 0, endIndex: Int32(data.count))
+        return buffer
     }
     
     var body: some View {
@@ -28,7 +31,13 @@ struct ContentView: View {
             let modelSin = sineCalc.calculate(x: radians)
             Text("Model Sinus: \(modelSin, format: .number.precision(.fractionLength(4)))")
             Button("Modell Laden") {
-                // try await sineCalc.loadModel()
+                Task {
+                    do {
+                        try await sineCalc.loadModel()
+                    } catch {
+                        print("Error loading model: \(error)")
+                    }
+                }
             }
             .padding()
           }
