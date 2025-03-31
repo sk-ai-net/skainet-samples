@@ -4,7 +4,14 @@ import SinusApproximatorKit
 struct ContentView: View {
     @State var radians = 0.0
     @State private var showContent = false
-    let sineCalc = ASinusCalculator()
+    let kIx = Kotlinx_io_coreBuffer()
+    let y:Kotlinx_io_coreSource? = nil
+    let sineCalc = ASinusCalculator {
+        guard let dataURL = Bundle.main.url(forResource: "sinus", withExtension: "json"), let input = InputStream(url: dataURL) else {
+            fatalError("Could not load model")
+        }
+        return KotlinInputStream(input)
+    }
     
     var body: some View {
         VStack {
@@ -21,7 +28,7 @@ struct ContentView: View {
             let modelSin = sineCalc.calculate(x: radians)
             Text("Model Sinus: \(modelSin, format: .number.precision(.fractionLength(4)))")
             Button("Modell Laden") {
-                sineCalc.loadModel()
+                // try await sineCalc.loadModel()
             }
             .padding()
           }
