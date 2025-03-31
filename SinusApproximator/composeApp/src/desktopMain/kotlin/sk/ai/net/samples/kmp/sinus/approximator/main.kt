@@ -4,6 +4,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.io.asSource
 import kotlinx.io.buffered
+import kotlinx.io.files.SystemFileSystem
 
 fun main() = application {
 

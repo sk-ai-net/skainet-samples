@@ -9,10 +9,12 @@ struct ContentView: View {
         guard let dataURL = Bundle.main.url(forResource: "sinus", withExtension: "json") else {
             fatalError("Could not load model")
         }
-        let data = try! Data(contentsOf: dataURL)
-        let buffer = Kotlinx_io_coreBuffer()
-        buffer.write(source: data.kotlinByteArray, startIndex: 0, endIndex: Int32(data.count))
-        return buffer
+//        let data = try! Data(contentsOf: dataURL)
+//        let buffer = Kotlinx_io_coreBuffer()
+//        buffer.write(source: data.kotlinByteArray, startIndex: 0, endIndex: Int32(data.count))
+//        
+//        return buffer
+        return ModelDataKt.fileSource(path: dataURL.path)
     }
     
     var body: some View {
