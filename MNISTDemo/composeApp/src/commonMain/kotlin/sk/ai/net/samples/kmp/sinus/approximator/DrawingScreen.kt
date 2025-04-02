@@ -33,14 +33,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.kkon.kmp.ai.sinus.approximator.ASinusCalculator
+import com.kkon.kmp.ai.sinus.approximator.ADigitClassifier
+import com.kkon.kmp.ai.sinus.approximator.DigitClassifier
 import kotlinx.coroutines.launch
 import kotlinx.io.Source
 import mnistdemo.composeapp.generated.resources.Res
@@ -136,7 +143,6 @@ import mnistdemo.composeapp.generated.resources.img_9
 import mnistdemo.composeapp.generated.resources.img_90
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // List of image resources
 val IMAGE_RESOURCES = listOf(
@@ -235,7 +241,7 @@ val IMAGE_RESOURCES = listOf(
 @Composable
 fun DrawingScreen(handleSource: () -> Source) {
 
-    val digitClassifier by remember { mutableStateOf(ASinusCalculator(handleSource)) }
+    val digitClassifier by remember { mutableStateOf(ADigitClassifier(handleSource)) }
 
     /* Screen mode controls*/
     var isModelLoaded by remember { mutableStateOf(false) }
@@ -345,7 +351,8 @@ fun DrawingScreen(handleSource: () -> Source) {
                 classificationResult = null
             },
             onClassify = {
-                val result = digitClassifier.calculate(0.0)
+                val bitmap = drawPathsToImageBitmap(paths)
+                val result = digitClassifier.classify(bitmap.toGrayScale28To28Image())
                 classificationResult = "Predicted digit: $result"
             },
         )
@@ -476,13 +483,64 @@ fun ButtonsPanel(
     }
 }
 
-@Composable
-@Preview
-fun ChooseImagePanelPreview() {
-    ChooseImagePanel(
-        modifier = Modifier,
-        imageResources = emptyList(),
-        selectedImageIndex = 1,
-        onImageSelected = {},
-    )
+fun drawPathsToImageBitmap(
+    paths: List<Path>,
+    bitmapSize: IntSize = IntSize(500, 500),
+    pathColor: Color = Color.Black,
+    strokeWidth: Float = 5f
+): ImageBitmap {
+    // Create an ImageBitmap with given dimensions
+    val imageBitmap = ImageBitmap(bitmapSize.width, bitmapSize.height)
+
+    // Create a Canvas to draw onto the ImageBitmap
+    val canvas = androidx.compose.ui.graphics.Canvas(imageBitmap)
+
+    // Define a Paint object
+    val paint = Paint().apply {
+        this.color = pathColor
+        this.style = PaintingStyle.Stroke
+        this.strokeWidth = strokeWidth
+    }
+
+    // Draw each path onto the canvas
+    paths.forEach { path ->
+        canvas.drawPath(path, paint)
+    }
+
+    return imageBitmap.also {
+        debugInConsolePrinting(it)
+    }
+}
+
+private fun ImageBitmap.toGrayScale28To28Image(): DigitClassifier.GrayScale28To28Image {
+    val image = DigitClassifier.GrayScale28To28Image()
+
+//    val img = ImageIO.read(Files.newInputStream(this.first()))
+//    val resizedImg = BufferedImage(28, 28, BufferedImage.TYPE_BYTE_GRAY)
+//    val graphics = resizedImg.createGraphics()
+//    graphics.drawImage(img, 0, 0, 28, 28, null)
+//    graphics.dispose()
+//
+//    for (y in 0 until 28) {
+//        for (x in 0 until 28) {
+//            val rgb = resizedImg.getRGB(x, y) and 0xFF
+//            image.setPixel(x, y, rgb / 255.0f)
+//        }
+//    }
+
+    return image
+}
+
+fun debugInConsolePrinting(bitmap: ImageBitmap) {
+    val pixelMap = bitmap.toPixelMap()
+    val width = bitmap.width
+    val height = bitmap.height
+
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val color = pixelMap[x, y]
+            print(if (color.toArgb() > 0) "@" else "_")
+        }
+        println()
+    }
 }
