@@ -15,11 +15,11 @@ androidx-testExt = "1.2.1"
 composeHotReload = "1.0.0"
 composeMultiplatform = "1.10.0"
 junit = "4.13.2"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.1.3"
 logback = "1.5.18"
-skainet = "0.13.0"
+skainet = "0.16.0"
 kotlinxIo = "0.8.2"
 ktorClientCore = "3.3.3"
 ktorClientPlugins = "3.1.1"
@@ -43,7 +43,7 @@ skainet-lang-dag = { module = "sk.ainet.core:skainet-lang-dag", version.ref = "s
 skainet-compile-core = { module = "sk.ainet.core:skainet-compile-core", version.ref = "skainet" }
 skainet-compile-dag = { module = "sk.ainet.core:skainet-compile-dag", version.ref = "skainet" }
 skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu", version.ref = "skainet" }
-skainet-backend-cpu-jvm = { module = "sk.ainet.core:skainet-backend-cpu-jvm", version.ref = "skainet" }
+skainet-backend-cpu-jvm = { module = "sk.ainet.core:skainet-backend-cpu", version.ref = "skainet" }
 skainet-data-api = { module = "sk.ainet.core:skainet-data-api", version.ref = "skainet" }
 skainet-data-simple = { module = "sk.ainet.core:skainet-data-basic", version.ref = "skainet" }
 skainet-io-core = { module = "sk.ainet.core:skainet-io-core", version.ref = "skainet" }

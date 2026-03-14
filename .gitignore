@@ -29,6 +29,9 @@ replay_pid*
 .idea
 .kotlin
 
+# Large GGUF model files (downloaded via scripts/download_tinylama.py)
+KllamaDemo/composeApp/src/commonMain/composeResources/files/*.gguf
+
 # Generated site directories
 site/
 preview-site/

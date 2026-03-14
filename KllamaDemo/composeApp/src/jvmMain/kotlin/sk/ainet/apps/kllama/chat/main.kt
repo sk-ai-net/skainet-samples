@@ -17,6 +17,7 @@ fun main() = application {
             loader = CommonModelLoader(),
             dataSource = FileSystemModelDataSource()
         )
+        ServiceLocator.supportsEmbeddedModelLoading = true
     }
 
     logSimdStatus()

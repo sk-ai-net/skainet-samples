@@ -1,6 +1,7 @@
 package sk.ainet.apps.kllama.chat.data.repository
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -18,11 +19,12 @@ import sk.ainet.apps.kllama.chat.domain.model.ModelMetadata
 import sk.ainet.apps.kllama.chat.domain.model.currentTimeMillis
 import sk.ainet.apps.kllama.chat.domain.port.ModelLoadResult
 import sk.ainet.apps.kllama.chat.logging.AppLogger
-import sk.ainet.io.gguf.llama.LlamaModelMetadata
-import sk.ainet.io.gguf.llama.LlamaRuntimeWeights
-import sk.ainet.io.gguf.llama.LlamaWeightLoader
-import sk.ainet.io.gguf.llama.LlamaWeightMapper
+import sk.ainet.models.llama.LlamaModelMetadata
+import sk.ainet.models.llama.LlamaRuntimeWeights
+import sk.ainet.models.llama.LlamaWeightLoader
+import sk.ainet.models.llama.LlamaWeightMapper
 import sk.ainet.context.DirectCpuExecutionContext
+import sk.ainet.io.model.QuantPolicy
 import sk.ainet.lang.types.FP32
 
 /**
@@ -100,20 +102,35 @@ class CommonModelLoader : PlatformModelLoader {
 
             val loader = LlamaWeightLoader(
                 sourceProvider = sourceProvider,
-                quantPolicy = LlamaWeightLoader.QuantPolicy.DEQUANTIZE_TO_FP32
+                quantPolicy = QuantPolicy.DEQUANTIZE_TO_FP32
             )
 
             emit(ModelLoadingState.LoadingWeights(fileName))
+            AppLogger.debug("ModelLoader", "loadModelWithProgress: loadToMap starting")
 
+            val weightStart = currentTimeMillis()
             val weights = loader.loadToMap<FP32, Float>(ctx)
+            AppLogger.debug("ModelLoader", "loadModelWithProgress: loadToMap done", mapOf(
+                "elapsedMs" to "${currentTimeMillis() - weightStart}"
+            ))
 
             emit(ModelLoadingState.LoadingWeights(fileName, phase = "Mapping weights"))
+            AppLogger.debug("ModelLoader", "loadModelWithProgress: LlamaWeightMapper.map starting")
 
+            val mapStart = currentTimeMillis()
             val runtimeWeights = LlamaWeightMapper.map(weights)
+            AppLogger.debug("ModelLoader", "loadModelWithProgress: LlamaWeightMapper.map done", mapOf(
+                "elapsedMs" to "${currentTimeMillis() - mapStart}"
+            ))
 
             emit(ModelLoadingState.InitializingRuntime(fileName))
+            AppLogger.debug("ModelLoader", "loadModelWithProgress: createRuntimeAndTokenizer starting")
 
+            val runtimeStart = currentTimeMillis()
             val result = createRuntimeAndTokenizer(ctx, runtimeWeights, sourceProvider)
+            AppLogger.debug("ModelLoader", "loadModelWithProgress: createRuntimeAndTokenizer done", mapOf(
+                "elapsedMs" to "${currentTimeMillis() - runtimeStart}"
+            ))
 
             currentRuntime = result.runtime
             currentTokenizer = result.tokenizer
@@ -178,7 +195,7 @@ class CommonModelLoader : PlatformModelLoader {
 
             val loader = LlamaWeightLoader(
                 sourceProvider = sourceProvider,
-                quantPolicy = LlamaWeightLoader.QuantPolicy.DEQUANTIZE_TO_FP32
+                quantPolicy = QuantPolicy.DEQUANTIZE_TO_FP32
             )
 
             val weightStart = currentTimeMillis()
@@ -271,13 +288,31 @@ class CommonModelLoader : PlatformModelLoader {
 
             val loader = LlamaWeightLoader(
                 sourceProvider = sourceProvider,
-                quantPolicy = LlamaWeightLoader.QuantPolicy.DEQUANTIZE_TO_FP32
+                quantPolicy = QuantPolicy.DEQUANTIZE_TO_FP32
             )
 
-            AppLogger.debug("ModelLoader", "Loading weights from source...")
+            val weightStart = currentTimeMillis()
+            AppLogger.info("ModelLoader", "Phase 1/3: loadToMap starting...")
             val weights = loader.loadToMap<FP32, Float>(ctx)
+            AppLogger.info("ModelLoader", "Phase 1/3: loadToMap done", mapOf(
+                "elapsedMs" to "${currentTimeMillis() - weightStart}"
+            ))
+            delay(1) // yield to WASM event loop between phases
+
+            val mapStart = currentTimeMillis()
+            AppLogger.info("ModelLoader", "Phase 2/3: LlamaWeightMapper.map starting...")
             val runtimeWeights = LlamaWeightMapper.map(weights)
+            AppLogger.info("ModelLoader", "Phase 2/3: LlamaWeightMapper.map done", mapOf(
+                "elapsedMs" to "${currentTimeMillis() - mapStart}"
+            ))
+            delay(1) // yield to WASM event loop between phases
+
+            val runtimeStart = currentTimeMillis()
+            AppLogger.info("ModelLoader", "Phase 3/3: createRuntimeAndTokenizer starting...")
             val result = createRuntimeAndTokenizer(ctx, runtimeWeights, sourceProvider)
+            AppLogger.info("ModelLoader", "Phase 3/3: createRuntimeAndTokenizer done", mapOf(
+                "elapsedMs" to "${currentTimeMillis() - runtimeStart}"
+            ))
 
             currentRuntime = result.runtime
             currentTokenizer = result.tokenizer

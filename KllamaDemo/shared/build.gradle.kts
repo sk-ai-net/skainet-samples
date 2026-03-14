@@ -43,9 +43,12 @@ kotlin {
             // SKaiNET I/O
             implementation(libs.skainet.io.core)
             implementation(libs.skainet.io.gguf)
+
+            // SKaiNET-transformers: Llama inference (LlamaWeightLoader, LlamaRuntime, etc.)
+            implementation(libs.skainet.inference.llama)
         }
         jvmMain.dependencies {
-            // SKaiNET KLlama (GGUFTokenizer, LlamaRuntime, CpuAttentionBackend) - JVM only
+            // SKaiNET KLlama (GGUFTokenizer, CpuAttentionBackend) - JVM only
             implementation(libs.skainet.kllama)
             // SKaiNET LLM + Agent APIs (generateUntilStop, ChatMLTemplate, Tokenizer)
             implementation(libs.skainet.llm)

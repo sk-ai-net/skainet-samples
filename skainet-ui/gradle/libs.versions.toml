@@ -2,8 +2,8 @@
 agp = "8.12.3"
 android-compileSdk = "36"
 android-minSdk = "24"
-composeMultiplatform = "1.10.0"
-kotlin = "2.3.0"
+composeMultiplatform = "1.10.1"
+kotlin = "2.3.10"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

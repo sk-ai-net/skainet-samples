@@ -2,7 +2,7 @@ package sk.ainet.apps.kllama.chat.data.repository
 
 import kotlinx.io.Source
 import sk.ainet.context.ExecutionContext
-import sk.ainet.io.gguf.llama.LlamaRuntimeWeights
+import sk.ainet.models.llama.LlamaRuntimeWeights
 import sk.ainet.lang.types.FP32
 
 /**

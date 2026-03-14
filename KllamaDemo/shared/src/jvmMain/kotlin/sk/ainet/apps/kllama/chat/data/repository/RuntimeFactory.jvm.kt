@@ -3,9 +3,9 @@ package sk.ainet.apps.kllama.chat.data.repository
 import kotlinx.io.Source
 import sk.ainet.apps.kllama.CpuAttentionBackend
 import sk.ainet.apps.kllama.GGUFTokenizer
-import sk.ainet.apps.kllama.LlamaRuntime
 import sk.ainet.context.ExecutionContext
-import sk.ainet.io.gguf.llama.LlamaRuntimeWeights
+import sk.ainet.models.llama.LlamaRuntime
+import sk.ainet.models.llama.LlamaRuntimeWeights
 import sk.ainet.lang.types.FP32
 
 actual fun createRuntimeAndTokenizer(

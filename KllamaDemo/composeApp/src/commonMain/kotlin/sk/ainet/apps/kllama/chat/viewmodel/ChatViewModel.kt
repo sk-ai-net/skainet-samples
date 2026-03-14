@@ -9,11 +9,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.io.Buffer
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import sk.ainet.apps.kllama.chat.data.file.FilePickerResult
 import sk.ainet.apps.kllama.chat.data.model.ModelFormatDetector
 import sk.ainet.apps.kllama.chat.data.repository.CommonModelLoader
+import sk.ainet.apps.kllama.chat.di.ServiceLocator
 import sk.ainet.apps.kllama.chat.domain.model.ChatMessage
 import sk.ainet.apps.kllama.chat.domain.model.ChatSession
 import sk.ainet.apps.kllama.chat.domain.model.DiscoveredModel
@@ -23,7 +27,9 @@ import sk.ainet.apps.kllama.chat.domain.model.InferenceStatistics
 import sk.ainet.apps.kllama.chat.domain.model.LoadedModel
 import sk.ainet.apps.kllama.chat.domain.model.MessageRole
 import sk.ainet.apps.kllama.chat.domain.model.ModelDiscoveryState
+import sk.ainet.apps.kllama.chat.domain.model.ModelFormat
 import sk.ainet.apps.kllama.chat.domain.model.ModelLoadingState
+import sk.ainet.apps.kllama.chat.domain.model.currentTimeMillis
 import sk.ainet.apps.kllama.chat.domain.port.InferenceEngine
 import sk.ainet.apps.kllama.chat.domain.port.ModelLoadResult
 import sk.ainet.apps.kllama.chat.domain.port.ModelRepository
@@ -61,6 +67,7 @@ class ChatViewModel(
 
     init {
         discoverModels()
+        loadEmbeddedModelIfAvailable()
     }
 
     /**
@@ -106,6 +113,103 @@ class ChatViewModel(
                 }
             } catch (_: Exception) {
                 // Skip metadata enrichment for this model
+            }
+        }
+    }
+
+    /**
+     * Attempt to auto-load the embedded TinyLlama model from Compose resources.
+     * This provides a working chat experience immediately after app launch.
+     * If no embedded model is bundled, this silently does nothing.
+     */
+    @OptIn(ExperimentalResourceApi::class)
+    private fun loadEmbeddedModelIfAvailable() {
+        viewModelScope.launch {
+            try {
+                val name = "tinyllama-1.1b-chat-v1.0-q4_k_m.gguf"
+                val loadStartTime = currentTimeMillis()
+                _uiState.update {
+                    it.copy(
+                        modelState = ModelLoadingState.ParsingMetadata(name),
+                        errorMessage = null
+                    )
+                }
+                // delay() yields to the browser event loop on WASM (via setTimeout),
+                // unlike yield() which only yields to other coroutines on the same dispatcher.
+                delay(50)
+                AppLogger.info("ChatViewModel", "Checkpoint: UI state set", mapOf(
+                    "elapsedMs" to "${currentTimeMillis() - loadStartTime}"
+                ))
+
+                AppLogger.info("ChatViewModel", "Downloading embedded model: $name")
+                val bytes = kllamademo.composeapp.generated.resources.Res.readBytes(
+                    "files/$name"
+                )
+                AppLogger.info(
+                    "ChatViewModel",
+                    "Embedded model downloaded: ${bytes.size / 1024 / 1024} MB",
+                    mapOf("elapsedMs" to "${currentTimeMillis() - loadStartTime}")
+                )
+
+                _uiState.update {
+                    it.copy(modelState = ModelLoadingState.LoadingWeights(name))
+                }
+                delay(50)
+                AppLogger.info("ChatViewModel", "Checkpoint: LoadingWeights emitted", mapOf(
+                    "elapsedMs" to "${currentTimeMillis() - loadStartTime}"
+                ))
+
+                val source = Buffer().also { it.write(bytes) }
+
+                _uiState.update {
+                    it.copy(
+                        modelState = ModelLoadingState.LoadingWeights(
+                            name, phase = "Parsing weights — this may take a moment"
+                        )
+                    )
+                }
+                delay(50)
+                AppLogger.info("ChatViewModel", "Checkpoint: about to call loadModel", mapOf(
+                    "elapsedMs" to "${currentTimeMillis() - loadStartTime}"
+                ))
+
+                when (val result = modelRepository.loadModel(
+                    source = source,
+                    name = name,
+                    sizeBytes = bytes.size.toLong(),
+                    format = ModelFormat.GGUF
+                )) {
+                    is ModelLoadResult.Success -> {
+                        currentInferenceEngine = inferenceEngineFactory(result.model)
+                        _uiState.update {
+                            it.copy(
+                                modelState = ModelLoadingState.Loaded(result.model, 0),
+                                showModelPicker = false
+                            )
+                        }
+                        AppLogger.info(
+                            "ChatViewModel",
+                            "Embedded model loaded: $name"
+                        )
+                    }
+                    is ModelLoadResult.Error -> {
+                        AppLogger.debug(
+                            "ChatViewModel",
+                            "Embedded model load failed: ${result.message}"
+                        )
+                        _uiState.update { it.copy(modelState = ModelLoadingState.Idle) }
+                    }
+                }
+            } catch (_: Exception) {
+                // No embedded model resource available — stay idle
+                _uiState.update { state ->
+                    if (state.modelState is ModelLoadingState.LoadingWeights ||
+                        state.modelState is ModelLoadingState.ParsingMetadata) {
+                        state.copy(modelState = ModelLoadingState.Idle)
+                    } else {
+                        state
+                    }
+                }
             }
         }
     }

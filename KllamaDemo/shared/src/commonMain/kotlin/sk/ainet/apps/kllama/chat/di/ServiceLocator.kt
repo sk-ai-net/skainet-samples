@@ -106,6 +106,13 @@ object ServiceLocator {
     fun getAppLogger(): AppLogger = AppLogger
 
     /**
+     * Whether the platform supports loading the embedded model from Compose resources.
+     * Set to true on JVM Desktop where there is enough memory and inference support.
+     * Leave false on Web/WASM (638MB resource would hang the browser).
+     */
+    var supportsEmbeddedModelLoading: Boolean = false
+
+    /**
      * Check if the service locator has been configured.
      */
     val isInitialized: Boolean

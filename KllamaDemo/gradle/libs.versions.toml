@@ -20,7 +20,7 @@ kotlinxIo = "0.8.2"
 ktor = "3.4.0"
 logback = "1.5.29"
 material3 = "1.10.0-alpha05"
-skainet = "0.13.0"
+skainet = "0.16.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -56,16 +56,19 @@ kotlinx-io-bytestring = { module = "org.jetbrains.kotlinx:kotlinx-io-bytestring"
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 
-# SKaiNET
+# SKaiNET core
 skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core", version.ref = "skainet" }
 skainet-lang-models = { module = "sk.ainet.core:skainet-lang-models", version.ref = "skainet" }
 skainet-compile-core = { module = "sk.ainet.core:skainet-compile-core", version.ref = "skainet" }
 skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu", version.ref = "skainet" }
 skainet-io-core = { module = "sk.ainet.core:skainet-io-core", version.ref = "skainet" }
 skainet-io-gguf = { module = "sk.ainet.core:skainet-io-gguf", version.ref = "skainet" }
-skainet-kllama = { module = "sk.ainet.core:skainet-apps-kllama", version.ref = "skainet" }
-skainet-kllama-agents = { module = "sk.ainet.core:skainet-kllama-agents", version.ref = "skainet" }
-skainet-llm = { module = "sk.ainet.core:skainet-llm", version.ref = "skainet" }
+
+# SKaiNET-transformers (LLM inference, runtime, agent)
+skainet-inference-llama = { module = "sk.ainet.transformers:skainet-transformers-inference-llama", version.ref = "skainet" }
+skainet-kllama = { module = "sk.ainet.transformers:skainet-transformers-runtime-kllama", version.ref = "skainet" }
+skainet-kllama-agents = { module = "sk.ainet.transformers:skainet-transformers-agent", version.ref = "skainet" }
+skainet-llm = { module = "sk.ainet.transformers:skainet-transformers-core", version.ref = "skainet" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
