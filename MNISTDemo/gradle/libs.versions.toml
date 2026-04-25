@@ -15,7 +15,7 @@ androidx-testExt = "1.2.1"
 composeHotReload = "1.0.0"
 composeMultiplatform = "1.10.0"
 junit = "4.13.2"
-kotlin = "2.3.10"
+kotlin = "2.3.21"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.1.3"
 logback = "1.5.18"
@@ -38,7 +38,6 @@ kotlinx-io-bytestring = { module = "org.jetbrains.kotlinx:kotlinx-io-bytestring"
 # SKaiNET
 skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core", version.ref = "skainet" }
 skainet-lang-models = { module = "sk.ainet.core:skainet-lang-models", version.ref = "skainet" }
-skainet-lang-kan = { module = "sk.ainet.core:skainet-lang-kan", version.ref = "skainet" }
 skainet-lang-dag = { module = "sk.ainet.core:skainet-lang-dag", version.ref = "skainet" }
 skainet-compile-core = { module = "sk.ainet.core:skainet-compile-core", version.ref = "skainet" }
 skainet-compile-dag = { module = "sk.ainet.core:skainet-compile-dag", version.ref = "skainet" }
@@ -49,7 +48,6 @@ skainet-data-simple = { module = "sk.ainet.core:skainet-data-basic", version.ref
 skainet-io-core = { module = "sk.ainet.core:skainet-io-core", version.ref = "skainet" }
 skainet-io-gguf = { module = "sk.ainet.core:skainet-io-gguf", version.ref = "skainet" }
 skainet-io-onnx = { module = "sk.ainet.core:skainet-io-onnx", version.ref = "skainet" }
-skainet-io-safetensors = { module = "sk.ainet.core:skainet-io-safetensors", version.ref = "skainet" }
 
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCore" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientCore" }

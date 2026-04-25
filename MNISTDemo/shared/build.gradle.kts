@@ -30,7 +30,6 @@ kotlin {
             // SKaiNET core
             implementation(libs.skainet.lang.core)
             implementation(libs.skainet.lang.models)
-            implementation(libs.skainet.lang.kan)
             implementation(libs.skainet.lang.dag)
 
             // SKaiNET compilation
@@ -47,7 +46,6 @@ kotlin {
             // SKaiNET I/O
             implementation(libs.skainet.io.core)
             implementation(libs.skainet.io.gguf)
-            implementation(libs.skainet.io.safetensors)
         }
 
         commonTest.dependencies {
