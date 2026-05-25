@@ -6,11 +6,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import sk.ainet.apps.kllama.chat.navigation.ChatNavigationHost
+import sk.ainet.apps.kllama.chat.playground.QwenPlaygroundHost
 import sk.ainet.ui.theme.SKaiNETTheme
 
 /**
- * Main app composable with SKaiNET Design System theming.
+ * Main app composable with SKaiNET Design System theming. Renders the
+ * Qwen3-0.6B playground (multi-tab, multi-mode showcase).
  */
 @Composable
 fun App(
@@ -22,7 +23,7 @@ fun App(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            ChatNavigationHost()
+            QwenPlaygroundHost()
         }
     }
 }

@@ -44,11 +44,16 @@ kotlin {
             implementation(libs.skainet.io.core)
             implementation(libs.skainet.io.gguf)
 
-            // SKaiNET-transformers: Llama + Qwen inference (DecoderGgufWeightLoader, QwenNetworkLoader)
-            implementation(libs.skainet.inference.llama)
-            implementation(libs.skainet.inference.qwen)
-            // SKaiNET LLM core - OptimizedLLMRuntime, Tokenizer, TokenizerFactory, GenerateExtensions
-            implementation(libs.skainet.llm)
+            // SKaiNET-transformers: Llama + Qwen inference. Promoted to api()
+            // so the composeApp playground UI can call Tokenizer / OptimizedLLMRuntime
+            // / QwenNetworkLoader directly.
+            api(libs.skainet.inference.llama)
+            api(libs.skainet.inference.qwen)
+            api(libs.skainet.llm)
+            api(libs.skainet.lang.core)
+            api(libs.skainet.backend.cpu)
+            api(libs.skainet.io.gguf)
+            api(libs.skainet.io.core)
         }
         jvmMain.dependencies {
             // SKaiNET KLlama (GGUFTokenizer, CpuAttentionBackend) - JVM only
