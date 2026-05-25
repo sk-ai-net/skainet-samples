@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import kllamademo.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
-private const val MODEL_RESOURCE_PATH = "files/qwen3-0.6b-Q4_K_M.gguf"
+private const val MODEL_RESOURCE_PATH = "files/qwen3-0.6b-Q3_K_S.gguf"
 
 /**
  * Top-level Qwen3-0.6B playground host. Owns the singleton [QwenModelHolder]
@@ -44,7 +44,7 @@ fun QwenPlaygroundHost() {
     }
 
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Tokenizer", "Chat", "Completion", "Translate", "Tool call")
+    val tabs = listOf("Visualize", "Tokenizer", "Chat", "Completion", "Translate", "Tool call")
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab) {
@@ -62,11 +62,12 @@ fun QwenPlaygroundHost() {
             contentAlignment = Alignment.TopStart,
         ) {
             when (selectedTab) {
-                0 -> TokenizerTab(state)
-                1 -> ChatTab(state)
-                2 -> CompletionTab(state)
-                3 -> TranslateTab(state)
-                4 -> ToolCallTab(state)
+                0 -> ExplainerTab(holder = holder, state = state)
+                1 -> TokenizerTab(state)
+                2 -> ChatTab(state)
+                3 -> CompletionTab(state)
+                4 -> TranslateTab(state)
+                5 -> ToolCallTab(state)
             }
         }
 
@@ -97,7 +98,7 @@ private fun Footer(state: QwenLoadingState) {
                     else MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = "Model: Qwen3-0.6B (Q4_K_M) — Apache 2.0 — Alibaba Cloud / Qwen team",
+            text = "Model: Qwen3-0.6B (Q3_K_S, ~280 MB) — Apache 2.0 — Alibaba Cloud / Qwen team",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

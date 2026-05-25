@@ -24,7 +24,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        title = "KLlama Chat - Offline LLM",
+        title = "Transformer Explainer — Qwen3-0.6B on SKaiNET",
         state = rememberWindowState(size = DpSize(1024.dp, 768.dp))
     ) {
         App()

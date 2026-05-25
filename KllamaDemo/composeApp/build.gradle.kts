@@ -132,16 +132,24 @@ val fetchQwenModel by tasks.registering(Exec::class) {
     commandLine("bash", scriptPath.asFile.absolutePath)
     inputs.file(scriptPath)
     val modelFile = rootProject.layout.projectDirectory.file(
-        "composeApp/src/commonMain/composeResources/files/qwen3-0.6b-Q4_K_M.gguf"
+        "composeApp/src/commonMain/composeResources/files/qwen3-0.6b-Q3_K_S.gguf"
     )
     outputs.file(modelFile)
-    onlyIf { !modelFile.asFile.exists() || modelFile.asFile.length() < 300L * 1024 * 1024 }
+    onlyIf { !modelFile.asFile.exists() || modelFile.asFile.length() < 200L * 1024 * 1024 }
 }
 
-// Make every Kotlin compile task depend on the model being on disk —
-// composeResources can't be packaged otherwise.
-tasks.matching { it.name.startsWith("compileKotlin") || it.name.startsWith("compileJava") }
-    .configureEach { dependsOn(fetchQwenModel) }
+// Make every Kotlin compile task AND every Compose-resources copy task
+// depend on the model being on disk. Without this, Gradle 9's strict
+// implicit-dependency validator fails because the resource-copy task
+// reads from a directory that fetchQwenModel writes into.
+tasks.matching {
+    it.name.startsWith("compileKotlin") ||
+        it.name.startsWith("compileJava") ||
+        it.name.startsWith("convertXmlValueResourcesFor") ||
+        it.name.startsWith("copyNonXmlValueResourcesFor") ||
+        it.name.startsWith("prepareComposeResourcesTaskFor") ||
+        it.name.startsWith("generateResourceAccessorsFor")
+}.configureEach { dependsOn(fetchQwenModel) }
 
 compose.desktop {
     application {
