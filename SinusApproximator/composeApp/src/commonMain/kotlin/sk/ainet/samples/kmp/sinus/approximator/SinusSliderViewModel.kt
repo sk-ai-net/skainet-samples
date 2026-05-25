@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import sk.ainet.app.samples.sinus.KanSinusCalculator
 import sk.ainet.app.samples.sinus.MLPSinusCalculator
 import sk.ainet.app.samples.sinus.PretrainedSinusCalculator
 import kotlin.math.abs
@@ -26,14 +25,13 @@ sealed interface ModelLoadingState {
 
 class SinusSliderViewModel() : ViewModel() {
     private val calculator = MLPSinusCalculator()
-    private val kanCalculator = KanSinusCalculator()
     private val pretrainedCalculator = PretrainedSinusCalculator()
 
     private val _modelLoadingState = MutableStateFlow<ModelLoadingState>(ModelLoadingState.Initial)
     val modelLoadingState: StateFlow<ModelLoadingState> = _modelLoadingState.asStateFlow()
 
-    // Expose the neural network model (use KAN calculator model)
-    val neuralNetworkModel get() = kanCalculator.model
+    // Expose the neural network model (MLP calculator)
+    val neuralNetworkModel get() = calculator.model
 
     var sliderValue by mutableStateOf(0f)
         private set
@@ -135,19 +133,19 @@ class SinusSliderViewModel() : ViewModel() {
         sliderValue = value
         sinusValue = sin(value.toDouble())
         // Compute models
-        modelSinusValueKan = kanCalculator.calculate(value)
         modelSinusValueMlp = calculator.calculate(value)
         modelSinusValuePretrained = pretrainedCalculator.calculate(value)
 
-        // Keep legacy fields aligned to KAN for compatibility
-        modelSinusValue = modelSinusValueKan
+        // Keep legacy fields aligned to MLP for compatibility
+        modelSinusValue = modelSinusValueMlp
+        modelSinusValueKan = modelSinusValueMlp
 
         // Errors
-        errorValueKan = abs(sinusValue - modelSinusValueKan)
         errorValueMlp = abs(sinusValue - modelSinusValueMlp)
         errorValuePretrained = abs(sinusValue - modelSinusValuePretrained)
-        // Legacy single error equals KAN error for now
-        errorValue = errorValueKan
+        errorValueKan = errorValueMlp
+        // Legacy single error equals MLP error
+        errorValue = errorValueMlp
         updateFormattedValues()
     }
 
@@ -156,7 +154,6 @@ class SinusSliderViewModel() : ViewModel() {
             _modelLoadingState.value = ModelLoadingState.Loading
             try {
                 // Load models (currently no-ops as they are preloaded with weights)
-                kanCalculator.loadModel()
                 calculator.loadModel()
                 pretrainedCalculator.loadModel()
                 _modelLoadingState.value = ModelLoadingState.Success

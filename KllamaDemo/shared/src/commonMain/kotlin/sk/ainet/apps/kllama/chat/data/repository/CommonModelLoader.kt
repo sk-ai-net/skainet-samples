@@ -21,7 +21,7 @@ import sk.ainet.apps.kllama.chat.domain.port.ModelLoadResult
 import sk.ainet.apps.kllama.chat.logging.AppLogger
 import sk.ainet.models.llama.LlamaModelMetadata
 import sk.ainet.models.llama.LlamaRuntimeWeights
-import sk.ainet.models.llama.LlamaWeightLoader
+import sk.ainet.models.llama.DecoderGgufWeightLoader
 import sk.ainet.models.llama.LlamaWeightMapper
 import sk.ainet.context.DirectCpuExecutionContext
 import sk.ainet.io.model.QuantPolicy
@@ -100,7 +100,7 @@ class CommonModelLoader : PlatformModelLoader {
 
             emit(ModelLoadingState.ParsingMetadata(fileName))
 
-            val loader = LlamaWeightLoader(
+            val loader = DecoderGgufWeightLoader(
                 sourceProvider = sourceProvider,
                 quantPolicy = QuantPolicy.DEQUANTIZE_TO_FP32
             )
@@ -193,7 +193,7 @@ class CommonModelLoader : PlatformModelLoader {
                 "format" to "GGUF"
             ))
 
-            val loader = LlamaWeightLoader(
+            val loader = DecoderGgufWeightLoader(
                 sourceProvider = sourceProvider,
                 quantPolicy = QuantPolicy.DEQUANTIZE_TO_FP32
             )
@@ -286,7 +286,7 @@ class CommonModelLoader : PlatformModelLoader {
                 "format" to "GGUF"
             ))
 
-            val loader = LlamaWeightLoader(
+            val loader = DecoderGgufWeightLoader(
                 sourceProvider = sourceProvider,
                 quantPolicy = QuantPolicy.DEQUANTIZE_TO_FP32
             )
@@ -363,7 +363,7 @@ class CommonModelLoader : PlatformModelLoader {
             val ioPath = Path(path)
             if (!SystemFileSystem.exists(ioPath)) return null
 
-            val loader = LlamaWeightLoader(
+            val loader = DecoderGgufWeightLoader(
                 sourceProvider = { SystemFileSystem.source(ioPath).buffered() },
                 loadTensorData = false
             )

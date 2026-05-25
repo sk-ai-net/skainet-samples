@@ -40,7 +40,6 @@ kotlin {
             implementation(libs.skainet.compile.core)
             implementation(libs.skainet.compile.dag)
             implementation(libs.skainet.backend.cpu)
-            implementation(libs.skainet.lang.kan)
             implementation(libs.skainet.data.api)
             implementation(libs.skainet.data.simple)
         }
