@@ -71,7 +71,14 @@ kotlin {
 }
 
 tasks.withType<Test>().configureEach {
-    jvmArgs("--enable-preview", "--add-modules", "jdk.incubator.vector")
+    // SIMD-accelerated CPU ops via JDK Vector API (incubator). The same
+    // flag set as :composeApp:run uses, so jvmTest exercise the SIMD path
+    // we ship in production.
+    jvmArgs(
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-preview",
+        "-Dskainet.cpu.vector.enabled=true",
+    )
 }
 
 android {

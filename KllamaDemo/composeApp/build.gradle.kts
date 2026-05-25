@@ -116,13 +116,22 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
+// Single source-of-truth for the JVM flags SKaiNET needs to engage
+// SIMD-accelerated CPU ops via the JDK Vector API (incubator). Used by
+// :composeApp:run, by tests, and by the packaged native distribution.
+val skainetSimdJvmArgs = listOf(
+    "--add-modules", "jdk.incubator.vector",
+    "--enable-preview",
+    "-Dskainet.cpu.vector.enabled=true",
+)
+
 tasks.withType<JavaExec>().configureEach {
-    jvmArgs("--enable-preview", "--add-modules", "jdk.incubator.vector")
+    jvmArgs(skainetSimdJvmArgs)
     maxHeapSize = "16g"
 }
 
 tasks.withType<Test>().configureEach {
-    jvmArgs("--enable-preview", "--add-modules", "jdk.incubator.vector")
+    jvmArgs(skainetSimdJvmArgs)
 }
 
 val fetchQwenModel by tasks.registering(Exec::class) {
@@ -159,10 +168,7 @@ compose.desktop {
             "-Xmx32G",                              // Increased heap for large models
             "-XX:+UseG1GC",                         // Better GC for large heaps
             "-XX:MaxGCPauseMillis=100",             // Reduce GC pauses
-            "--add-modules", "jdk.incubator.vector",
-            "--enable-preview",
-            "-Dskainet.cpu.vector.enabled=true"
-        )
+        ) + skainetSimdJvmArgs
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
