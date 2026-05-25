@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Fetch the Qwen3-0.6B GGUF (Q4_K_M, ~400 MB) into the composeApp's
+# Fetch the Qwen3-0.6B GGUF (Q4_0, ~380 MB) into the composeApp's
 # commonMain composeResources so the bundled wasmJs / desktop / Android / iOS
-# artifacts all carry the model. The destination is .gitignore'd via the
-# top-level *.gguf rule.
+# artifacts all carry the model. Q4_0 is the SIMD-friendly packed quant —
+# DecoderGgufMemSegConverter wraps these tensors as Q4MemorySegmentTensorData
+# so the CPU matmul stays in packed-byte form (4-bit weights), giving a
+# much faster forward pass than the heavier K-quants which fully dequantize
+# to FP32. The destination is .gitignore'd via the top-level *.gguf rule.
 
-MODEL_URL="https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q3_K_S.gguf"
+MODEL_URL="https://huggingface.co/unsloth/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_0.gguf"
 DEST_DIR="$(cd "$(dirname "$0")/.." && pwd)/composeApp/src/commonMain/composeResources/files"
-DEST_FILE="$DEST_DIR/qwen3-0.6b-Q3_K_S.gguf"
-MIN_SIZE_BYTES=$((200 * 1024 * 1024))   # sanity floor: 200 MB (Q3_K_S is ~280 MB)
+DEST_FILE="$DEST_DIR/qwen3-0.6b-Q4_0.gguf"
+MIN_SIZE_BYTES=$((300 * 1024 * 1024))   # sanity floor: 300 MB (Q4_0 is ~380 MB)
 
 mkdir -p "$DEST_DIR"
 
@@ -23,7 +26,7 @@ if [[ -f "$DEST_FILE" ]]; then
     rm -f "$DEST_FILE"
 fi
 
-echo "Fetching Qwen3-0.6B-Q3_K_S.gguf (~280 MB) from Hugging Face..."
+echo "Fetching Qwen3-0.6B-Q4_0.gguf (~380 MB, packed SIMD-friendly quant) from Hugging Face..."
 curl -L --fail --progress-bar -o "$DEST_FILE" "$MODEL_URL"
 
 size=$(stat -f%z "$DEST_FILE" 2>/dev/null || stat -c%s "$DEST_FILE")

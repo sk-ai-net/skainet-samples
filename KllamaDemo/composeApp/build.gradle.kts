@@ -116,12 +116,19 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
-// Single source-of-truth for the JVM flags SKaiNET needs to engage
-// SIMD-accelerated CPU ops via the JDK Vector API (incubator). Used by
-// :composeApp:run, by tests, and by the packaged native distribution.
+// Single source-of-truth for the JVM flags SKaiNET needs:
+// - jdk.incubator.vector + --enable-preview engage the JDK Vector API
+//   for SIMD-accelerated CPU ops
+// - --enable-native-access=ALL-UNNAMED lets MemorySegment Arena (Panama
+//   FFM API) open without "restricted access" warnings on JDK 21+;
+//   DecoderGgufMemSegConverter uses Arena.ofShared() to back Q4_0/Q8_0
+//   tensors with off-heap memory for SIMD-packed matmul kernels.
+// - skainet.cpu.vector.enabled=true is the explicit opt-in switch the
+//   library inspects to confirm the host wants the SIMD code path.
 val skainetSimdJvmArgs = listOf(
     "--add-modules", "jdk.incubator.vector",
     "--enable-preview",
+    "--enable-native-access=ALL-UNNAMED",
     "-Dskainet.cpu.vector.enabled=true",
 )
 
@@ -141,10 +148,10 @@ val fetchQwenModel by tasks.registering(Exec::class) {
     commandLine("bash", scriptPath.asFile.absolutePath)
     inputs.file(scriptPath)
     val modelFile = rootProject.layout.projectDirectory.file(
-        "composeApp/src/commonMain/composeResources/files/qwen3-0.6b-Q3_K_S.gguf"
+        "composeApp/src/commonMain/composeResources/files/qwen3-0.6b-Q4_0.gguf"
     )
     outputs.file(modelFile)
-    onlyIf { !modelFile.asFile.exists() || modelFile.asFile.length() < 200L * 1024 * 1024 }
+    onlyIf { !modelFile.asFile.exists() || modelFile.asFile.length() < 300L * 1024 * 1024 }
 }
 
 // Make every Kotlin compile task AND every Compose-resources copy task

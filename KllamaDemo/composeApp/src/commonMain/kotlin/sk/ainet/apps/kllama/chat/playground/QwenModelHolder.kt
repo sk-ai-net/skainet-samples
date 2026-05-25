@@ -63,21 +63,10 @@ class QwenModelHolder {
             return
         }
 
-        _state.value = QwenLoadingState.Loading("Loading 600M-parameter weights (this can take ~40s)...")
+        _state.value = QwenLoadingState.Loading("Loading 600M-parameter weights (Q4_0 packed; first call can take ~20-40s)...")
         val runtime = try {
             withContext(Dispatchers.Default) {
-                val sourceProvider = { Buffer().apply { write(bytes) } }
-                val model = QwenNetworkLoader
-                    .fromGguf(sourceProvider, QuantPolicy.DEQUANTIZE_TO_FP32)
-                    .load<FP32, Float>(ctx)
-
-                OptimizedLLMRuntime(
-                    model = model,
-                    ctx = ctx,
-                    mode = OptimizedLLMMode.DIRECT,
-                    dtype = FP32::class,
-                    bos = tokenizer.bosTokenId,
-                )
+                buildQwenRuntime(ctx, bytes, tokenizer.bosTokenId)
             }
         } catch (e: Throwable) {
             _state.value = QwenLoadingState.Failed(

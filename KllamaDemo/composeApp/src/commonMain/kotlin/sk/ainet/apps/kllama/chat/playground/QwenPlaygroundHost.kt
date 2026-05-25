@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import sk.ainet.ui.components.LoadingIndicator
 
-private const val MODEL_RESOURCE_PATH = "files/qwen3-0.6b-Q3_K_S.gguf"
+private const val MODEL_RESOURCE_PATH = "files/qwen3-0.6b-Q4_0.gguf"
 
 /**
  * Top-level Qwen3-0.6B playground host. Owns the singleton [QwenModelHolder]
