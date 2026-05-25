@@ -66,6 +66,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.datetime)
             implementation(projects.shared)
             implementation("sk.ainet.ui:skainet-ui")
         }
@@ -123,6 +124,24 @@ tasks.withType<JavaExec>().configureEach {
 tasks.withType<Test>().configureEach {
     jvmArgs("--enable-preview", "--add-modules", "jdk.incubator.vector")
 }
+
+val fetchQwenModel by tasks.registering(Exec::class) {
+    description = "Downloads the Qwen3-0.6B-Q4_K_M GGUF into composeResources/files. Skips if present."
+    group = "build setup"
+    val scriptPath = rootProject.layout.projectDirectory.file("scripts/fetch-qwen-model.sh")
+    commandLine("bash", scriptPath.asFile.absolutePath)
+    inputs.file(scriptPath)
+    val modelFile = rootProject.layout.projectDirectory.file(
+        "composeApp/src/commonMain/composeResources/files/qwen3-0.6b-Q4_K_M.gguf"
+    )
+    outputs.file(modelFile)
+    onlyIf { !modelFile.asFile.exists() || modelFile.asFile.length() < 300L * 1024 * 1024 }
+}
+
+// Make every Kotlin compile task depend on the model being on disk —
+// composeResources can't be packaged otherwise.
+tasks.matching { it.name.startsWith("compileKotlin") || it.name.startsWith("compileJava") }
+    .configureEach { dependsOn(fetchQwenModel) }
 
 compose.desktop {
     application {

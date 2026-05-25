@@ -44,7 +44,7 @@ fun QwenPlaygroundHost() {
     }
 
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Tokenizer", "Chat")
+    val tabs = listOf("Tokenizer", "Chat", "Completion", "Translate", "Tool call")
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab) {
@@ -64,6 +64,9 @@ fun QwenPlaygroundHost() {
             when (selectedTab) {
                 0 -> TokenizerTab(state)
                 1 -> ChatTab(state)
+                2 -> CompletionTab(state)
+                3 -> TranslateTab(state)
+                4 -> ToolCallTab(state)
             }
         }
 
