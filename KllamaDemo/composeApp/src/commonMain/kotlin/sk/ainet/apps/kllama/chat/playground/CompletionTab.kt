@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sk.ainet.apps.llm.generate
+import sk.ainet.ui.components.LoadingIndicator
 
 /**
  * Raw completion: prompt → token stream, no chat template. Useful for
@@ -51,7 +53,15 @@ fun CompletionTab(state: QwenLoadingState) {
             enabled = !generating,
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (state !is QwenLoadingState.Ready) {
+            ModelLoadingPanel(state)
+            return@Column
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Button(
                 enabled = state is QwenLoadingState.Ready && !generating,
                 onClick = {
@@ -76,6 +86,10 @@ fun CompletionTab(state: QwenLoadingState) {
             ) { Text(if (generating) "Generating..." else "Complete") }
 
             Button(enabled = !generating, onClick = { output = "" }) { Text("Clear") }
+
+            if (generating) {
+                LoadingIndicator(size = 24.dp)
+            }
         }
 
         Text(

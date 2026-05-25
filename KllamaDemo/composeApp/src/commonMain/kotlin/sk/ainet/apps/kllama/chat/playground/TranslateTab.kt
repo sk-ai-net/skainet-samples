@@ -15,9 +15,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import sk.ainet.ui.components.LoadingIndicator
 
 private enum class Direction(val label: String, val systemPrompt: String) {
     EN_TO_ZH(
@@ -47,6 +49,10 @@ fun TranslateTab(state: QwenLoadingState) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (state !is QwenLoadingState.Ready) {
+            ModelLoadingPanel(state)
+            return@Column
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Direction.entries.forEach { d ->
                 Button(
@@ -64,6 +70,10 @@ fun TranslateTab(state: QwenLoadingState) {
             enabled = !generating,
         )
 
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
         Button(
             enabled = state is QwenLoadingState.Ready && !generating,
             onClick = {
@@ -90,6 +100,8 @@ fun TranslateTab(state: QwenLoadingState) {
                 }
             },
         ) { Text(if (generating) "Translating..." else "Translate") }
+            if (generating) LoadingIndicator(size = 24.dp)
+        }
 
         Text(
             text = if (output.isEmpty() && !generating) "(translation will appear here)" else output,

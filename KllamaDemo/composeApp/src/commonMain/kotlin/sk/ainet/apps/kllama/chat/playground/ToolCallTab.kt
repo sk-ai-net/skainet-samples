@@ -2,6 +2,7 @@ package sk.ainet.apps.kllama.chat.playground
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import sk.ainet.ui.components.LoadingIndicator
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -48,6 +50,10 @@ fun ToolCallTab(state: QwenLoadingState) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (state !is QwenLoadingState.Ready) {
+            ModelLoadingPanel(state)
+            return@Column
+        }
         Text(
             "Experimental — Qwen3-0.6B is small and may not emit clean tool-call JSON without finetuning. This tab is a faithful demo of the round-trip even when the model misbehaves.",
             style = MaterialTheme.typography.bodySmall,
@@ -60,6 +66,10 @@ fun ToolCallTab(state: QwenLoadingState) {
             style = MaterialTheme.typography.bodyMedium,
         )
 
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
         Button(
             enabled = state is QwenLoadingState.Ready && !running,
             onClick = {
@@ -110,6 +120,8 @@ fun ToolCallTab(state: QwenLoadingState) {
                 }
             },
         ) { Text(if (running) "Running..." else "Run the round-trip") }
+            if (running) LoadingIndicator(size = 24.dp)
+        }
 
         Labeled(label = "Model turn 1 (expected: JSON tool call)") {
             Text(

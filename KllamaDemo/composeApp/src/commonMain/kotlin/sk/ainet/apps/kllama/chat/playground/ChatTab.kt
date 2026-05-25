@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import sk.ainet.ui.components.LoadingIndicator
 
 /**
  * Chat tab using Qwen's ChatML template applied inline. Streams tokens as
@@ -48,7 +50,10 @@ fun ChatTab(state: QwenLoadingState) {
             enabled = !generating,
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Button(
                 enabled = state is QwenLoadingState.Ready && !generating,
                 onClick = {
@@ -77,6 +82,10 @@ fun ChatTab(state: QwenLoadingState) {
                 enabled = !generating,
                 onClick = { response = "" },
             ) { Text("Clear") }
+
+            if (generating) {
+                LoadingIndicator(size = 24.dp)
+            }
         }
 
         when (state) {
@@ -95,10 +104,7 @@ fun ChatTab(state: QwenLoadingState) {
                 "Model failed to load: ${state.message}",
                 color = MaterialTheme.colorScheme.error,
             )
-            else -> Text(
-                "Model still loading. The first response can be slow on CPU; subsequent tokens are faster.",
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            else -> ModelLoadingPanel(state)
         }
     }
 }
