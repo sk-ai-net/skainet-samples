@@ -2,7 +2,6 @@ package sk.ainet.apps.kllama.chat
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
-import kotlinx.browser.document
 import sk.ainet.apps.kllama.chat.data.repository.CommonModelLoader
 import sk.ainet.apps.kllama.chat.di.ServiceLocator
 
@@ -13,7 +12,7 @@ fun main() {
         ServiceLocator.configure(loader = CommonModelLoader())
     }
 
-    ComposeViewport(document.body!!) {
+    ComposeViewport("composeApplication") {
         App()
     }
 }

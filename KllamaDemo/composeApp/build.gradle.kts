@@ -13,6 +13,15 @@ plugins {
 kotlin {
     jvmToolchain(21)
 
+    applyDefaultHierarchyTemplate {
+        common {
+            group("web") {
+                withJs()
+                withWasmJs()
+            }
+        }
+    }
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
@@ -66,6 +75,11 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+        }
+        named("webMain").configure {
+            dependencies {
+                implementation(libs.kotlinx.browser)
+            }
         }
     }
 }
