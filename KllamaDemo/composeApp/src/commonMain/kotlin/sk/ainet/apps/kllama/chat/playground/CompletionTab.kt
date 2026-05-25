@@ -20,7 +20,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sk.ainet.apps.llm.generate
 
 /**
@@ -59,11 +61,13 @@ fun CompletionTab(state: QwenLoadingState) {
                     scope.launch {
                         try {
                             val tokens = ready.tokenizer.encode(prompt)
-                            ready.runtime.generate(
-                                prompt = tokens,
-                                steps = 128,
-                                temperature = 0.8f,
-                            ) { id -> output += ready.tokenizer.decode(id) }
+                            withContext(Dispatchers.Default) {
+                                ready.runtime.generate(
+                                    prompt = tokens,
+                                    steps = 128,
+                                    temperature = 0.8f,
+                                ) { id -> output += ready.tokenizer.decode(id) }
+                            }
                         } finally {
                             generating = false
                         }

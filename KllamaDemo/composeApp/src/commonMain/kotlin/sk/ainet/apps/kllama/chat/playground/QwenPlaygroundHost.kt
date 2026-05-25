@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -22,7 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kllamademo.composeapp.generated.resources.Res
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import sk.ainet.ui.components.LoadingIndicator
 
 private const val MODEL_RESOURCE_PATH = "files/qwen3-0.6b-Q3_K_S.gguf"
 
@@ -38,7 +40,7 @@ fun QwenPlaygroundHost() {
 
     LaunchedEffect(Unit) {
         if (state is QwenLoadingState.Idle) {
-            val bytes = Res.readBytes(MODEL_RESOURCE_PATH)
+            val bytes = withContext(Dispatchers.Default) { Res.readBytes(MODEL_RESOURCE_PATH) }
             holder.load(bytes)
         }
     }
@@ -89,7 +91,7 @@ private fun Footer(state: QwenLoadingState) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (state is QwenLoadingState.Loading) {
-            CircularProgressIndicator(modifier = Modifier.padding(top = 4.dp))
+            LoadingIndicator(size = 36.dp, modifier = Modifier.padding(top = 4.dp))
         }
         Text(
             text = label,

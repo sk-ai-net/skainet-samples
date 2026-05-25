@@ -1,8 +1,10 @@
 package sk.ainet.apps.kllama.chat.playground
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import kotlinx.io.Buffer
 import sk.ainet.apps.kllama.chat.playground.explainer.ArchitectureSummary
 import sk.ainet.apps.kllama.chat.playground.explainer.InstrumentedExecutionContext
@@ -50,8 +52,9 @@ class QwenModelHolder {
 
         _state.value = QwenLoadingState.Loading("Reading tokenizer from GGUF metadata...")
         val tokenizer = try {
-            val source = Buffer().apply { write(bytes) }
-            GGUFTokenizer.fromSource(source)
+            withContext(Dispatchers.Default) {
+                GGUFTokenizer.fromSource(Buffer().apply { write(bytes) })
+            }
         } catch (e: Throwable) {
             _state.value = QwenLoadingState.Failed(
                 stage = "tokenizer",
@@ -62,18 +65,20 @@ class QwenModelHolder {
 
         _state.value = QwenLoadingState.Loading("Loading 600M-parameter weights (this can take ~40s)...")
         val runtime = try {
-            val sourceProvider = { Buffer().apply { write(bytes) } }
-            val model = QwenNetworkLoader
-                .fromGguf(sourceProvider, QuantPolicy.DEQUANTIZE_TO_FP32)
-                .load<FP32, Float>(ctx)
+            withContext(Dispatchers.Default) {
+                val sourceProvider = { Buffer().apply { write(bytes) } }
+                val model = QwenNetworkLoader
+                    .fromGguf(sourceProvider, QuantPolicy.DEQUANTIZE_TO_FP32)
+                    .load<FP32, Float>(ctx)
 
-            OptimizedLLMRuntime(
-                model = model,
-                ctx = ctx,
-                mode = OptimizedLLMMode.DIRECT,
-                dtype = FP32::class,
-                bos = tokenizer.bosTokenId,
-            )
+                OptimizedLLMRuntime(
+                    model = model,
+                    ctx = ctx,
+                    mode = OptimizedLLMMode.DIRECT,
+                    dtype = FP32::class,
+                    bos = tokenizer.bosTokenId,
+                )
+            }
         } catch (e: Throwable) {
             _state.value = QwenLoadingState.Failed(
                 stage = "model-load",
@@ -102,11 +107,11 @@ class QwenModelHolder {
      * is responsible for resetting the runtime (or building a fresh one)
      * between explainer sessions.
      */
-    fun stepInstrumented(
+    suspend fun stepInstrumented(
         tokenId: Int,
         priorTokens: IntArray,
         temperature: Float,
-    ): StepSnapshot {
+    ): StepSnapshot = withContext(Dispatchers.Default) {
         val ready = _state.value as? QwenLoadingState.Ready ?: error("Model not loaded")
         instrumented.reset()
         instrumented.captureEnabled = true
@@ -126,7 +131,7 @@ class QwenModelHolder {
         }
         val topK = topKEntries(logitVec, k = 10, tokenizer = ready.tokenizer, temperature = temperature)
 
-        return StepSnapshot(
+        StepSnapshot(
             inputTokenId = tokenId,
             tokensSoFar = priorTokens + sampledId,
             sampledTokenId = sampledId,
@@ -242,12 +247,14 @@ class QwenModelHolder {
         onChunk: (String) -> Unit,
     ) {
         val ready = _state.value as? QwenLoadingState.Ready ?: error("Model not loaded")
-        ready.runtime.generate(
-            prompt = promptTokens,
-            steps = maxTokens,
-            temperature = temperature,
-        ) { id ->
-            onChunk(ready.tokenizer.decode(id))
+        withContext(Dispatchers.Default) {
+            ready.runtime.generate(
+                prompt = promptTokens,
+                steps = maxTokens,
+                temperature = temperature,
+            ) { id ->
+                onChunk(ready.tokenizer.decode(id))
+            }
         }
     }
 }

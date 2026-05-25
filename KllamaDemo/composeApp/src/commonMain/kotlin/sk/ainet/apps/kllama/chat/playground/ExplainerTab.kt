@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ import sk.ainet.apps.kllama.chat.playground.explainer.AttentionHeatmap
 import sk.ainet.apps.kllama.chat.playground.explainer.ResidualBars
 import sk.ainet.apps.kllama.chat.playground.explainer.StepSnapshot
 import sk.ainet.apps.kllama.chat.playground.explainer.TopKBars
+import sk.ainet.ui.components.LoadingIndicator
 
 /**
  * The headline tab. Step through Qwen3-0.6B token-by-token and inspect what
@@ -73,7 +75,10 @@ fun ExplainerTab(
             enabled = !promptProcessed && !working,
         )
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Button(
                 enabled = state is QwenLoadingState.Ready && !working,
                 onClick = {
@@ -124,11 +129,15 @@ fun ExplainerTab(
                 )
             }
 
-            if (snapshot != null) {
+            if (working) {
+                LoadingIndicator(size = 24.dp)
+            }
+
+            if (snapshot != null && !working) {
                 Text(
                     "Step latency: ${snapshot!!.elapsedMillis} ms",
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.wrapContentHeight().padding(top = 12.dp),
+                    modifier = Modifier.wrapContentHeight(),
                 )
             }
         }
