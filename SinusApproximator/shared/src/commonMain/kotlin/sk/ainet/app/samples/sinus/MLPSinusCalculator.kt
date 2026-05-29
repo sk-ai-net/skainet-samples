@@ -11,7 +11,6 @@ import sk.ainet.lang.nn.network
 import sk.ainet.lang.tensor.dsl.tensor
 import sk.ainet.lang.tensor.relu
 import sk.ainet.lang.types.FP32
-import sk.ainet.lang.kan.examples.SineKanPretrained
 
 
 class SineNN(private val ctx: ExecutionContext) {
@@ -111,40 +110,6 @@ class MLPSinusCalculator() : SinusCalculator {
     override fun calculate(angle: Float): Float = _model.calcSine(angle)
 
     fun getLatencyResults() = observer.results()
-
-    override suspend fun loadModel() {
-        // TODO model has pretrained weights as a part of model
-    }
-}
-
-class KanSinusCalculator() : SinusCalculator {
-    private val ctx = DirectCpuExecutionContext()
-
-    fun sk.ainet.lang.nn.Module<FP32, Float>.calcSine(ctx: ExecutionContext, angle: Float): Float {
-        val model_: sk.ainet.lang.nn.Module<FP32, kotlin.Float> = this
-        return computation<Float>(ctx) {
-            // Create a simple input tensor compatible with the model's expected input size (1)
-            model_.forward(
-                data<FP32, Float>(ctx) {
-                    tensor<FP32, Float>() {
-                        // Using shape(1, 1) to represent a single scalar input in 2D form
-                        shape(1, 1) {
-                            fromArray(
-                                floatArrayOf(angle)
-                            )
-                        }
-                    }
-                }, ctx
-            ).data[0, 0]
-        }
-    }
-
-
-    val _model = SineKanPretrained.create(ctx)
-    val model = _model
-
-
-    override fun calculate(angle: Float): Float = _model.calcSine(ctx, angle)
 
     override suspend fun loadModel() {
         // TODO model has pretrained weights as a part of model
