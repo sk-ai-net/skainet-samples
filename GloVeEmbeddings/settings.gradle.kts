@@ -45,5 +45,10 @@ dependencyResolutionManagement {
     }
 }
 
+// Shared SKaiNET design system (theme + components). Consumed as an included
+// build so the example always uses the local source, matching the sibling
+// SinusApproximator / KllamaDemo examples.
+includeBuild("../skainet-ui")
+
 include(":glove")
 include(":app")

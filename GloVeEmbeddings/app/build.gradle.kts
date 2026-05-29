@@ -55,11 +55,17 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            // Shared SKaiNET design system: SKaiNETTheme, ThemeController, LoadingIndicator.
+            implementation("sk.ainet.ui:skainet-ui")
             // The GloVe library: Vocabulary, Embeddings, GloVeTextReader, analogy().
             implementation(projects.glove)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            // Provides Dispatchers.Main for the JVM desktop target. Without it,
+            // viewModelScope.launch (which dispatches on Main) throws
+            // "Module with the Main dispatcher is missing" at runtime.
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import sk.ainet.ui.components.LoadingIndicator
+import sk.ainet.ui.theme.SKaiNETTheme
+import sk.ainet.ui.theme.ThemeController
 
 /**
  * Offline embeddings explorer: type a word to see its nearest neighbours, or run vector
@@ -45,16 +50,37 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 public fun App() {
-    MaterialTheme {
+    // A ThemeController lets the user flip dark/light on every platform (the SKaiNET
+    // look defaults to its signature dark, red-accented theme).
+    val themeController = remember { ThemeController() }
+
+    SKaiNETTheme(themeController = themeController) {
         val vm = remember { EmbeddingsViewModel() }
         LaunchedEffect(Unit) { vm.loadEmbeddings() }
 
         Scaffold(
-            topBar = { TopAppBar(title = { Text("GloVe Embeddings Explorer") }) },
+            topBar = {
+                TopAppBar(
+                    title = { Text("GloVe Embeddings Explorer") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    actions = {
+                        IconButton(onClick = { themeController.toggleTheme() }) {
+                            Text(if (themeController.isDarkTheme) "☀️" else "🌙")
+                        }
+                    },
+                )
+            },
         ) { padding ->
             Column(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
                 when (val s = vm.load) {
-                    is LoadState.Loading -> Text("Loading bundled vectors…")
+                    is LoadState.Loading -> Row(verticalAlignment = Alignment.CenterVertically) {
+                        LoadingIndicator(size = 20.dp)
+                        Spacer(Modifier.width(12.dp))
+                        Text("Loading bundled vectors…")
+                    }
                     is LoadState.Failed -> Text(
                         "Failed to load embeddings: ${s.message}",
                         color = MaterialTheme.colorScheme.error,
