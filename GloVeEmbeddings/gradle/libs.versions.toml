@@ -1,0 +1,33 @@
+[versions]
+# Must match the Kotlin version SKaiNET was built with: SKaiNET 0.25.0 ships
+# klibs compiled with Kotlin 2.3.21, and an older compiler cannot read them
+# (JS/wasm fail with "Symbol for Any not found").
+kotlin = "2.3.21"
+# SKaiNET BOM version — published to Maven Central. The BOM pins every
+# sk.ainet.core:* artifact so individual libraries are declared without versions.
+skainet = "0.25.0"
+
+# Compose Multiplatform + Android — versions match the sibling MNISTDemo, a
+# known-good combination at Kotlin 2.3.21.
+agp = "8.12.3"
+composeMultiplatform = "1.10.0"
+androidx-lifecycle = "2.9.6"
+androidx-activityCompose = "1.12.2"
+android-compileSdk = "36"
+android-minSdk = "24"
+android-targetSdk = "36"
+
+[libraries]
+skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
+skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core" }
+skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+
+[plugins]
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
