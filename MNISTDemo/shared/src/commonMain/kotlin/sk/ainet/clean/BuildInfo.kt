@@ -5,5 +5,5 @@ package sk.ainet.clean
  * Version is kept in sync with gradle/libs.versions.toml.
  */
 object BuildInfo {
-    const val SKAINET_VERSION = "0.9.0"
+    const val SKAINET_VERSION = "0.25.0"
 }
