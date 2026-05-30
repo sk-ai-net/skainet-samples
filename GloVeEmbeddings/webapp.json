@@ -10,5 +10,5 @@
     "command": "./gradlew :app:wasmJsBrowserProductionWebpack",
     "description": "Builds the JS browser distribution"
   },
-  "screenshot": "docs/screenshots/wasm.png"
+  "screenshot": "docs/screenshots/glove.png"
 }
