@@ -44,15 +44,21 @@ kotlin {
             implementation(libs.skainet.io.core)
             implementation(libs.skainet.io.gguf)
 
-            // SKaiNET-transformers: Llama inference (DecoderGgufWeightLoader, LlamaRuntime, etc.)
-            implementation(libs.skainet.inference.llama)
-            // SKaiNET LLM core - needed in common for DecoderModelMetadata supertype access
-            implementation(libs.skainet.llm)
+            // SKaiNET-transformers: Llama + Qwen inference. Promoted to api()
+            // so the composeApp playground UI can call Tokenizer / OptimizedLLMRuntime
+            // / QwenNetworkLoader directly.
+            api(libs.skainet.inference.llama)
+            api(libs.skainet.inference.qwen)
+            api(libs.skainet.llm)
+            api(libs.skainet.lang.core)
+            api(libs.skainet.backend.cpu)
+            api(libs.skainet.io.gguf)
+            api(libs.skainet.io.core)
         }
         jvmMain.dependencies {
             // SKaiNET KLlama (GGUFTokenizer, CpuAttentionBackend) - JVM only
             implementation(libs.skainet.kllama)
-            // SKaiNET Agent APIs (generateUntilStop, ChatMLTemplate)
+            // SKaiNET Agent APIs (ChatSession, ToolRegistry, ChatTemplate) - JVM only
             implementation(libs.skainet.kllama.agents)
         }
         commonTest.dependencies {
@@ -65,7 +71,14 @@ kotlin {
 }
 
 tasks.withType<Test>().configureEach {
-    jvmArgs("--enable-preview", "--add-modules", "jdk.incubator.vector")
+    // SIMD-accelerated CPU ops via JDK Vector API (incubator). The same
+    // flag set as :composeApp:run uses, so jvmTest exercise the SIMD path
+    // we ship in production.
+    jvmArgs(
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-preview",
+        "-Dskainet.cpu.vector.enabled=true",
+    )
 }
 
 android {

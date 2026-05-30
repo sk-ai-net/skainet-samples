@@ -66,6 +66,7 @@ skainet-io-gguf = { module = "sk.ainet.core:skainet-io-gguf", version.ref = "ska
 
 # SKaiNET-transformers (LLM inference, runtime, agent)
 skainet-inference-llama = { module = "sk.ainet.transformers:skainet-transformers-inference-llama", version.ref = "skainet" }
+skainet-inference-qwen = { module = "sk.ainet.transformers:skainet-transformers-inference-qwen", version.ref = "skainet" }
 skainet-kllama = { module = "sk.ainet.transformers:skainet-transformers-runtime-kllama", version.ref = "skainet" }
 skainet-kllama-agents = { module = "sk.ainet.transformers:skainet-transformers-agent", version.ref = "skainet" }
 skainet-llm = { module = "sk.ainet.transformers:skainet-transformers-core", version.ref = "skainet" }

@@ -1,0 +1,9 @@
+This product bundles the Qwen3-0.6B language model (Q3_K_S quantization)
+released by Alibaba Cloud / Qwen team, distributed under the Apache License
+2.0 (see Apache-2.0.txt in this directory).
+
+Model source:  https://huggingface.co/Qwen/Qwen3-0.6B
+GGUF build:    https://huggingface.co/unsloth/Qwen3-0.6B-GGUF
+GGUF file:     Qwen3-0.6B-Q3_K_S.gguf  (~280 MB)
+
+Attribution: Qwen Team, Alibaba Cloud. See https://github.com/QwenLM/Qwen3.

@@ -1,95 +1,112 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM), Server.
+# KllamaDemo — Transformer Explainer on SKaiNET
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+A Compose Multiplatform / KMP / SKaiNET analog of the
+[Polo Club Transformer Explainer](https://poloclub.github.io/transformer-explainer/),
+running fully in the browser (and on JVM desktop, Android, iOS). The app
+ships with an embedded **Qwen3-0.6B** model (Q3_K_S GGUF, ~280 MB) and
+visualizes what the transformer is doing as it produces each token.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## What it demonstrates
 
-* [/server](./server/src/main/kotlin) is for the Ktor server application.
+A multi-tab UI driven by a single loaded model. The headline tab is the
+**Visualize** explainer; the other tabs reuse the same runtime to show
+related SKaiNET-transformer capabilities.
 
-* [/shared](./shared/src) is for the code that will be shared between all targets in the project.
-  The most important subfolder is [commonMain](./shared/src/commonMain/kotlin). If preferred, you
-  can add code to the platform-specific folders here too.
+- **Visualize** *(headline)* — type a prompt, click **Step**, watch the
+  next token be generated. See an architecture diagram of the 24-block
+  decoder stack, the post-softmax **attention heatmap** for any
+  block/head, the **residual stream** values out of any block, and the
+  top-10 **next-token probability bars**. Step token-by-token to see
+  the state of inference evolve.
+- **Tokenizer playground** — type text, see Qwen's BPE breakdown
+  into (id, decoded) pairs. Instant.
+- **Chat** — Qwen3 ChatML template applied inline, streaming tokens.
+- **Streaming completion** — raw prompt, no template, token-by-token.
+- **Translation** — en↔zh via a translation system prompt.
+- **Tool call** *(experimental)* — two-turn round-trip with a
+  `get_current_time` tool.
 
-### Build and Run Android Application
+## One-time setup — fetch the model
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+The 400 MB GGUF is not committed (`*.gguf` is `.gitignore`'d). Run the
+fetch script before building:
 
-### Build and Run Desktop (JVM) Application
+```shell
+./scripts/fetch-qwen-model.sh
+```
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+The script downloads `Qwen3-0.6B-Q3_K_S.gguf` from
+[unsloth/Qwen3-0.6B-GGUF](https://huggingface.co/unsloth/Qwen3-0.6B-GGUF)
+into `composeApp/src/commonMain/composeResources/files/`. It's
+idempotent and skips on subsequent runs.
 
-### Build and Run Server
+## Build and run
 
-To build and run the development version of the server, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :server:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :server:run
-  ```
+### Browser (wasmJs — primary target)
 
-### Build and Run Web Application
+```shell
+./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+```
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+The first page load downloads the full ~295 MB bundle including the
+embedded Q3_K_S model. Subsequent loads hit the browser HTTP cache.
 
-### Build and Run iOS Application
+### Desktop (JVM)
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+```shell
+./gradlew :composeApp:run
+```
 
----
+Model load takes ~30 s on first launch (FP32 dequantization of 600M
+parameters from the smaller Q3_K_S quant). Subsequent chat tokens
+stream at ~1-3 tok/s on CPU.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+### Android
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+```shell
+./gradlew :composeApp:assembleDebug
+```
+
+The debug APK includes the 400 MB model in `assets/` — too large for
+Play Store distribution as a single APK. A follow-up will split the
+model into an `assetPack` for AAB builds.
+
+### iOS
+
+Open `iosApp/iosApp.xcodeproj` in Xcode. The model ships as part of the
+iOS framework — the same caveat about bundle size applies.
+
+## Model & license
+
+This app bundles **Qwen3-0.6B** by Alibaba Cloud / Qwen team, licensed
+under the **Apache License 2.0**.
+
+- Model card: https://huggingface.co/Qwen/Qwen3-0.6B
+- GGUF build used:
+  [unsloth/Qwen3-0.6B-GGUF](https://huggingface.co/unsloth/Qwen3-0.6B-GGUF)
+  (Q3_K_S quantization)
+- License text: [THIRD_PARTY_LICENSES/Apache-2.0.txt](./THIRD_PARTY_LICENSES/Apache-2.0.txt)
+- Attribution: [THIRD_PARTY_LICENSES/NOTICE](./THIRD_PARTY_LICENSES/NOTICE)
+
+## Project structure
+
+- `composeApp/` — Compose Multiplatform application. The playground UI
+  lives under `composeApp/src/commonMain/kotlin/sk/ainet/apps/kllama/chat/playground/`.
+- `shared/` — model-loading types, the Phase-0 inference spike
+  (`spike/QwenSpike.kt`), and the platform-detection scaffold used by
+  the older filesystem-picker chat (now superseded by the playground).
+- `server/` — Ktor server (unrelated to the playground).
+- `iosApp/` — iOS entry point.
+- `scripts/fetch-qwen-model.sh` — model downloader.
+- `THIRD_PARTY_LICENSES/` — Apache 2.0 + NOTICE for the bundled model.
+
+## Testing the inference plumbing
+
+A JVM JUnit smoke test under `shared/src/jvmTest/` loads the embedded
+GGUF directly from disk and runs a 5-token forward pass — proves the
+`QwenNetworkLoader` → `OptimizedLLMRuntime` → `generate(...)` chain
+works without any UI involvement:
+
+```shell
+./gradlew :shared:jvmTest --tests "*QwenSpike*"
+```
