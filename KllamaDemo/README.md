@@ -88,6 +88,13 @@ under the **Apache License 2.0**.
 - License text: [THIRD_PARTY_LICENSES/Apache-2.0.txt](./THIRD_PARTY_LICENSES/Apache-2.0.txt)
 - Attribution: [THIRD_PARTY_LICENSES/NOTICE](./THIRD_PARTY_LICENSES/NOTICE)
 
+## Known issues
+
+- **Q4_1 quantization is not supported.** Loading a GGUF with Q4_1 tensors logs
+  `unsupported quant type Q4_1 ... passing through unchanged` and the forward pass
+  then fails at `matmul`. Use a Q3_K_S / Q4_0 / Q8_0 / F16 model instead. Tracked
+  upstream in [SKaiNET#654](https://github.com/SKaiNET-developers/SKaiNET/issues/654).
+
 ## Project structure
 
 - `composeApp/` — Compose Multiplatform application. The playground UI
