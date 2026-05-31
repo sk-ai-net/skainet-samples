@@ -40,5 +40,4 @@ plugins {
 includeBuild("../skainet-ui")
 
 include(":composeApp")
-include(":server")
 include(":shared")
