@@ -17,3 +17,13 @@ plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
         yarnLockAutoReplace = true
     }
 }
+
+// The wasm target uses a SEPARATE yarn root (WasmYarnPlugin), so it needs its own
+// policy in addition to the JS one above — this is what :kotlinWasmStoreYarnLock uses.
+plugins.withType<org.jetbrains.kotlin.gradle.targets.wasm.yarn.WasmYarnPlugin> {
+    the<org.jetbrains.kotlin.gradle.targets.wasm.yarn.WasmYarnRootExtension>().apply {
+        yarnLockMismatchReport = org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport.WARNING
+        reportNewYarnLock = false
+        yarnLockAutoReplace = true
+    }
+}
