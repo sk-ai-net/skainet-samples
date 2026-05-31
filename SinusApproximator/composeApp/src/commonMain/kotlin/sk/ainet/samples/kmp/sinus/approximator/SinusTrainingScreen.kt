@@ -85,7 +85,6 @@ fun SinusTrainingScreen(viewModel: SinusTrainingViewModel) {
                 SinusVisualization(
                     sliderValue = (PI.toFloat() / 4f), // Show at 45 degrees
                     actualSinus = kotlin.math.sin(PI / 4.0),
-                    approximatedSinusKan = 0f,
                     approximatedSinusMlp = 0f,
                     approximatedSinusPretrained = 0f,
                     approximatedSinusTrained = trainedValue,

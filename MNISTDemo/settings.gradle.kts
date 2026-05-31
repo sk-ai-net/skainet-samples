@@ -17,6 +17,10 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
+        // Resolve everything from Maven Central (SKaiNET is published there). No
+        // mavenLocal: an unrestricted mavenLocal is consulted first and can contain a
+        // partial kotlin-stdlib (JVM jar + POM, no klib variants) that shadows Central's
+        // variant-aware metadata, breaking the JS/wasm targets with "Missing stdlib class".
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -25,11 +29,6 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        mavenLocal {
-            mavenContent {
-                includeGroupAndSubgroups("sk.ainet")
-            }
-        }
     }
 }
 

@@ -1,8 +1,8 @@
 [versions]
-skainet = "0.25.0"
+skainet = "0.26.0"
 kotlin = "2.3.21"
-kotlinx-coroutines = "1.11.0"
-kotlinx-io = "0.9.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-io = "0.8.2"
 junit = "4.13.2"
 
 [libraries]

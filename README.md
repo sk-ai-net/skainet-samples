@@ -41,11 +41,21 @@ pretrained GGUF model and can also retrain it in-app.
 
 ---
 
+### 🔤 GloVe Embeddings
+
+Word-vector arithmetic and nearest-neighbour search over pretrained GloVe
+embeddings — `king - man + woman ≈ queen`, fully offline. A Compose Multiplatform
+app that shows how SKaiNET handles plain vector data, not just neural nets.
+
+📂 [`GloVeEmbeddings/`](GloVeEmbeddings/) · runs on Android · iOS · Desktop · Wasm
+
+---
+
 ### 💬 Kllama Demo
 
-A local LLM **chat app** — runs a GGUF Llama model fully on-device, no server, no
-API key. Compose Multiplatform UI with a streaming chat view and live token
-statistics, targeting Android, iOS, Web, Desktop and Server.
+A Qwen3 LLM **playground in the browser** — chat, completion, translation, tool
+calls, a tokenizer view and a transformer explainer that visualises attention and
+residuals, all running on-device with no server and no API key.
 
 📂 [`KllamaDemo/`](KllamaDemo/) · runs on Android · iOS · Desktop · Web · Server
 
@@ -68,6 +78,6 @@ Confidence: 98.3%
 If this is your first SKaiNET example, start with **Sinus Approximator** — it is
 the smallest end-to-end story (define a network, train it, see it predict) and
 runs on every platform. Then try **MNIST Demo** for a real convolutional model,
-and **Kllama Demo** to run a local LLM.
+**GloVe Embeddings** for vector arithmetic, and **Kllama Demo** to run a local LLM.
 
 Each example folder has its own `README.md` with build and run instructions.

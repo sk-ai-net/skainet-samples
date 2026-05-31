@@ -38,7 +38,6 @@ fun SinusSliderScreen(
         SinusVisualization(
             sliderValue = viewModel.sliderValue,
             actualSinus = viewModel.sinusValue,
-            approximatedSinusKan = viewModel.modelSinusValueKan,
             approximatedSinusMlp = viewModel.modelSinusValueMlp,
             approximatedSinusPretrained = viewModel.modelSinusValuePretrained,
             approximatedSinusTrained = trainedValue,
@@ -80,31 +79,11 @@ fun SinusSliderScreen(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-                // First Row: KAN and MLP
+                // First Row: MLP
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "KAN approximated",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        Text(
-                            text = viewModel.formattedModelSinusValueKan,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        Text(
-                            text = "Error: ${viewModel.formattedErrorValueKan}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
                     Column(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(4.dp)

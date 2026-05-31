@@ -3,7 +3,6 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
-        mavenLocal()
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -28,6 +27,8 @@ dependencyResolutionManagement {
     }
 }
 
+// Shared SKaiNET design system (theme + components) built from local source.
+// SKaiNET core/transformers artifacts are consumed from Maven Central.
 includeBuild("../skainet-ui")
 
 include(":composeApp")

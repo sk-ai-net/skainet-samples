@@ -19,14 +19,12 @@ import kotlin.math.sin
 fun SinusVisualization(
     sliderValue: Float,
     actualSinus: Double,
-    approximatedSinusKan: Float,
     approximatedSinusMlp: Float,
     approximatedSinusPretrained: Float? = null,
     approximatedSinusTrained: Float? = null,
     modifier: Modifier = Modifier
 ) {
     val primary = MaterialTheme.colorScheme.primary
-    val secondary = MaterialTheme.colorScheme.secondary
     val tertiary = MaterialTheme.colorScheme.tertiary
     val pretrainedColor = Color(0xFF673AB7) // Deep Purple for pretrained
     val trainedColor = Color(0xFF4CAF50) // Green for trained
@@ -78,7 +76,6 @@ fun SinusVisualization(
         // Calculate positions
         val x = dataToPixelX(sliderValue)
         val actualY = dataToPixelY(actualSinus.toFloat())
-        val approximatedYKan = dataToPixelY(approximatedSinusKan)
         val approximatedYMlp = dataToPixelY(approximatedSinusMlp)
 
         // Draw vertical dashed line at current x position
@@ -91,13 +88,6 @@ fun SinusVisualization(
         )
 
         // Draw error lines (from actual to approximated)
-        drawScope.drawLine(
-            secondary.copy(alpha = 0.5f),
-            Offset(x, actualY),
-            Offset(x, approximatedYKan),
-            strokeWidth = 2f,
-            cap = StrokeCap.Round
-        )
         drawScope.drawLine(
             tertiary.copy(alpha = 0.5f),
             Offset(x, actualY),
@@ -134,7 +124,6 @@ fun SinusVisualization(
 
         // Draw data points
         drawScope.drawCircle(primary, 6f, Offset(x, actualY))           // Actual sine
-        drawScope.drawCircle(secondary, 6f, Offset(x, approximatedYKan)) // KAN approximation
         drawScope.drawCircle(tertiary, 6f, Offset(x, approximatedYMlp))  // MLP approximation
     }
 }
