@@ -1,0 +1,94 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
+plugins {
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
+}
+
+kotlin {
+    jvmToolchain(21)
+
+    androidTarget()
+
+    iosArm64()
+    iosSimulatorArm64()
+
+    jvm()
+
+    js {
+        browser()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.kotlinx.coroutines)
+            implementation(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.datetime)
+
+            // SKaiNET core
+            implementation(libs.skainet.lang.core)
+            implementation(libs.skainet.lang.models)
+
+            // SKaiNET compilation
+            implementation(libs.skainet.compile.core)
+
+            // SKaiNET backend
+            implementation(libs.skainet.backend.cpu)
+
+            // SKaiNET I/O
+            implementation(libs.skainet.io.core)
+            implementation(libs.skainet.io.gguf)
+
+            // SKaiNET-transformers: Llama + Qwen inference. Promoted to api()
+            // so the composeApp playground UI can call Tokenizer / OptimizedLLMRuntime
+            // / QwenNetworkLoader directly.
+            api(libs.skainet.inference.llama)
+            api(libs.skainet.inference.qwen)
+            api(libs.skainet.llm)
+            api(libs.skainet.lang.core)
+            api(libs.skainet.backend.cpu)
+            api(libs.skainet.io.gguf)
+            api(libs.skainet.io.core)
+        }
+        jvmMain.dependencies {
+            // SKaiNET KLlama (GGUFTokenizer, CpuAttentionBackend) - JVM only
+            implementation(libs.skainet.kllama)
+            // SKaiNET Agent APIs (ChatSession, ToolRegistry, ChatTemplate) - JVM only
+            implementation(libs.skainet.kllama.agents)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
+        wasmJsMain.dependencies {
+            implementation(libs.kotlinx.browser)
+        }
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    // SIMD-accelerated CPU ops via JDK Vector API (incubator). The same
+    // flag set as :composeApp:run uses, so jvmTest exercise the SIMD path
+    // we ship in production.
+    jvmArgs(
+        "--add-modules", "jdk.incubator.vector",
+        "--enable-preview",
+        "-Dskainet.cpu.vector.enabled=true",
+    )
+}
+
+android {
+    namespace = "sk.ainet.apps.kllama.chat.shared"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+}

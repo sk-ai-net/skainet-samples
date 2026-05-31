@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kllama Chat - SKaiNET Examples</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: 220 20% 4%;
+      --foreground: 0 0% 95%;
+      --primary: 0 72% 51%;
+      --primary-foreground: 0 0% 100%;
+      --muted: 220 15% 12%;
+      --muted-foreground: 220 10% 50%;
+      --border: 220 15% 18%;
+      --radius: 0.5rem;
+    }
+    .light {
+      --background: 0 0% 98%;
+      --foreground: 220 20% 10%;
+      --muted: 220 15% 95%;
+      --muted-foreground: 220 10% 45%;
+      --border: 220 15% 88%;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      display: flex;
+      flex-direction: column;
+    }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .header {
+      border-bottom: 1px solid hsl(var(--border) / 0.5);
+      background-color: hsl(var(--background));
+      flex-shrink: 0;
+    }
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .logo-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+    .logo-link:hover { opacity: 0.8; }
+    .logo-img { height: 2rem; width: auto; }
+    .logo-text { font-size: 1.1rem; font-weight: 700; color: hsl(var(--foreground)); }
+    .logo-text .highlight { color: hsl(var(--primary)); }
+    .divider {
+      width: 1px;
+      height: 1.5rem;
+      background-color: hsl(var(--border));
+      margin: 0 0.25rem;
+    }
+    .app-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: hsl(var(--muted-foreground));
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.875rem;
+      min-height: 36px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      border: none;
+      white-space: nowrap;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: hsl(var(--foreground));
+    }
+    .btn-ghost:hover { background-color: hsl(var(--muted)); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid hsl(var(--border));
+      color: hsl(var(--foreground));
+    }
+    .btn-outline:hover { background-color: hsl(var(--muted)); }
+    .icon { width: 0.875rem; height: 0.875rem; }
+    .app-frame {
+      flex: 1;
+      border: none;
+      width: 100%;
+      background: white;
+    }
+    .footer {
+      border-top: 1px solid hsl(var(--border) / 0.5);
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: hsl(var(--muted-foreground));
+      flex-shrink: 0;
+    }
+    .theme-toggle {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 50;
+    }
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      border: 1px solid hsl(var(--border));
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-toggle-btn:hover { background-color: hsl(var(--muted)); }
+    @media (max-width: 600px) {
+      .header-content { padding: 0.5rem 0.75rem; }
+      .divider { display: none; }
+      .app-title { display: none; }
+      .btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; min-height: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle">
+    <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2"></path><path d="M12 20v2"></path>
+        <path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path>
+        <path d="M2 12h2"></path><path d="M20 12h2"></path>
+        <path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+      </svg>
+    </button>
+  </div>
+
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <a href="https://skainet.sk" class="logo-link">
+          <img src="logo.png" alt="SKaiNET" class="logo-img">
+          <span class="font-orbitron logo-text">SK<span class="highlight">ai</span>NET</span>
+        </a>
+        <div class="divider"></div>
+        <span class="app-title">Kllama Chat</span>
+      </div>
+      <div class="header-right">
+        <a href="https://github.com/SKaiNET-developers/skainet-samples/tree/develop/KllamaDemo" class="btn btn-outline" target="_blank" rel="noopener noreferrer">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+            <path d="M9 18c-4.51 2-5-2-7-2"></path>
+          </svg>
+          Source
+        </a>
+        <a href="https://examples.skainet.sk" class="btn btn-ghost">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+          All Examples
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <iframe src="app.html" class="app-frame" title="Kllama Chat"></iframe>
+
+  <footer class="footer">
+    &copy; 2025 SKaiNET. All rights reserved.
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      document.documentElement.classList.toggle('light');
+      localStorage.setItem('theme', document.documentElement.classList.contains('light') ? 'light' : 'dark');
+    }
+    (function() {
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
+</body>
+</html>

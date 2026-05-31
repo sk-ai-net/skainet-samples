@@ -19,6 +19,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        mavenLocal {
+            mavenContent {
+                includeGroupAndSubgroups("sk.ainet")
+            }
+        }
     }
 }
 

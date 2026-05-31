@@ -1,0 +1,13 @@
+{
+  "id": "kllamachat",
+  "name": "Kllama Demo",
+  "description": "Local LLM chat application using SKaiNET ML framework",
+  "distDirs": [
+    "composeApp/build/kotlin-webpack/wasmJs/productionExecutable",
+    "composeApp/build/processedResources/wasmJs/main"
+  ],
+  "build": {
+    "command": "./gradlew :composeApp:wasmJsBrowserProductionWebpack",
+    "description": "Builds the JS browser distribution"
+  }
+}
