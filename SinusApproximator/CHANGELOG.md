@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2026-07-07
+
+### Changed
+- Update to SKaiNET 0.34.0 from Maven Central.
+- Align Compose Multiplatform to 1.10.1 to match the shared `:skainet-ui`
+  design system (prevents a Skiko `UnsatisfiedLinkError` at first render on
+  desktop macOS/Metal).
+
 ## [0.6.1]
 
 ### Added
