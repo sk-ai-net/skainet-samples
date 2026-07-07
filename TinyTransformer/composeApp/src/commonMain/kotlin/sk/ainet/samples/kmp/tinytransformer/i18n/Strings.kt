@@ -52,7 +52,12 @@ data class Strings(
     val pleaseTokenizeFirst: String,
     val pleaseTrainFirst: String,
     val couldNotTokenize: String,
+    // Attribution
+    val attribution: String,
 )
+
+/** The original KI-ENNA project this sample is a port of. */
+const val KI_ENNA_URL = "https://statistical-thinking.de/ki-enna-transformer.html"
 
 val EnglishStrings = Strings(
     appTitle = "Tiny Transformer (KI-ENNA)",
@@ -95,6 +100,7 @@ val EnglishStrings = Strings(
     pleaseTokenizeFirst = "❌ Please tokenize first (1).",
     pleaseTrainFirst = "❌ Please train first (2).",
     couldNotTokenize = "❌ Could not tokenize the prompt.",
+    attribution = "Inspired by the KI-ENNA project — statistical-thinking.de",
 )
 
 val GermanStrings = Strings(
@@ -138,6 +144,7 @@ val GermanStrings = Strings(
     pleaseTokenizeFirst = "❌ Bitte zuerst tokenisieren (1).",
     pleaseTrainFirst = "❌ Bitte zuerst trainieren (2).",
     couldNotTokenize = "❌ Konnte nicht tokenisieren.",
+    attribution = "Inspiriert vom KI-ENNA-Projekt — statistical-thinking.de",
 )
 
 fun stringsFor(language: Language): Strings = when (language) {
