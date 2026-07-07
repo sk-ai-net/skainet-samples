@@ -20,7 +20,8 @@ kotlinxIo = "0.9.0"
 ktor = "3.4.0"
 logback = "1.5.29"
 material3 = "1.10.0-alpha05"
-skainet = "0.25.0"
+skainet = "0.34.0"
+skainet-transformers = "0.34.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -65,11 +66,11 @@ skainet-io-core = { module = "sk.ainet.core:skainet-io-core", version.ref = "ska
 skainet-io-gguf = { module = "sk.ainet.core:skainet-io-gguf", version.ref = "skainet" }
 
 # SKaiNET-transformers (LLM inference, runtime, agent)
-skainet-inference-llama = { module = "sk.ainet.transformers:skainet-transformers-inference-llama", version.ref = "skainet" }
-skainet-inference-qwen = { module = "sk.ainet.transformers:skainet-transformers-inference-qwen", version.ref = "skainet" }
-skainet-kllama = { module = "sk.ainet.transformers:skainet-transformers-runtime-kllama", version.ref = "skainet" }
-skainet-kllama-agents = { module = "sk.ainet.transformers:skainet-transformers-agent", version.ref = "skainet" }
-skainet-llm = { module = "sk.ainet.transformers:skainet-transformers-core", version.ref = "skainet" }
+skainet-inference-llama = { module = "sk.ainet.transformers:skainet-transformers-inference-llama", version.ref = "skainet-transformers" }
+skainet-inference-qwen = { module = "sk.ainet.transformers:skainet-transformers-inference-qwen", version.ref = "skainet-transformers" }
+skainet-kllama = { module = "sk.ainet.transformers:skainet-transformers-runtime-kllama", version.ref = "skainet-transformers" }
+skainet-kllama-agents = { module = "sk.ainet.transformers:skainet-transformers-agent", version.ref = "skainet-transformers" }
+skainet-llm = { module = "sk.ainet.transformers:skainet-transformers-core", version.ref = "skainet-transformers" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

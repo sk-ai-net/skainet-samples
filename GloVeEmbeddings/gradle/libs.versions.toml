@@ -1,11 +1,11 @@
 [versions]
-# Must match the Kotlin version SKaiNET was built with: SKaiNET 0.26.0 ships
+# Must match the Kotlin version SKaiNET was built with: SKaiNET 0.34.0 ships
 # klibs compiled with Kotlin 2.3.21, and an older compiler cannot read them
 # (JS/wasm fail with "Symbol for Any not found").
 kotlin = "2.3.21"
 # SKaiNET BOM version — published to Maven Central. The BOM pins every
 # sk.ainet.core:* artifact so individual libraries are declared without versions.
-skainet = "0.26.0"
+skainet = "0.34.0"
 
 # Compose Multiplatform + Android. Pinned to 1.10.1 to match the shared
 # :skainet-ui design system (included build): a mismatched Compose pulls two

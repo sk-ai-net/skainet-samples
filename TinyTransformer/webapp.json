@@ -1,0 +1,14 @@
+{
+  "id": "tinytransformer",
+  "name": "Tiny Transformer (KI-ENNA)",
+  "description": "Train a tiny decoder-only transformer live in the browser — inspired by the KI-ENNA project (statistical-thinking.de)",
+  "distDirs": [
+    "composeApp/build/kotlin-webpack/wasmJs/productionExecutable",
+    "composeApp/build/processedResources/wasmJs/main"
+  ],
+  "build": {
+    "command": "./gradlew :composeApp:wasmJsBrowserProductionWebpack",
+    "description": "Builds the wasm browser distribution"
+  },
+  "screenshot": "docs/screenshots/wasm.png"
+}

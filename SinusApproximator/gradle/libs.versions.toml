@@ -13,13 +13,17 @@ androidx-espresso = "3.6.1"
 androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.2.1"
 composeHotReload = "1.0.0"
-composeMultiplatform = "1.10.0"
+# Pinned to 1.10.1 to match the shared :skainet-ui design system (included
+# build): a mismatched Compose pulls two Skiko versions onto the desktop
+# classpath, which crashes with UnsatisfiedLinkError
+# (getAdapterMaxTextureSize) at first render on macOS/Metal.
+composeMultiplatform = "1.10.1"
 junit = "4.13.2"
 kotlin = "2.3.21"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.1.3"
 logback = "1.5.18"
-skainet = "0.26.0"
+skainet = "0.34.0"
 kotlinxIo = "0.8.2"
 
 [libraries]

@@ -1,0 +1,48 @@
+[versions]
+agp = "8.12.3"
+android-compileSdk = "36"
+android-minSdk = "24"
+#noinspection EditedTargetSdkVersion
+android-targetSdk = "36"
+androidx-activityCompose = "1.12.2"
+androidx-lifecycle = "2.9.6"
+composeHotReload = "1.0.0"
+# Pinned to 1.10.1 to match the shared :skainet-ui design system (included
+# build): a mismatched Compose pulls two Skiko versions onto the desktop
+# classpath, which crashes with UnsatisfiedLinkError
+# (getAdapterMaxTextureSize) at first render on macOS/Metal.
+composeMultiplatform = "1.10.1"
+# Must match the Kotlin version SKaiNET was built with: SKaiNET 0.34.0 ships
+# klibs compiled with Kotlin 2.3.21, and an older compiler cannot read them.
+kotlin = "2.3.21"
+kotlinx-coroutines = "1.10.2"
+# SKaiNET BOM version — published to Maven Central. The BOM pins every
+# sk.ainet.core:* artifact so individual libraries are declared without versions.
+skainet = "0.34.0"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+
+# SKaiNET — BOM-governed, core artifacts only (no sk.ainet.transformers:
+# this sample builds its transformer from scratch with the core NN DSL)
+skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
+skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core" }
+skainet-lang-models = { module = "sk.ainet.core:skainet-lang-models" }
+skainet-compile-core = { module = "sk.ainet.core:skainet-compile-core" }
+skainet-compile-dag = { module = "sk.ainet.core:skainet-compile-dag" }
+skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

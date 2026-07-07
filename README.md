@@ -51,6 +51,22 @@ app that shows how SKaiNET handles plain vector data, not just neural nets.
 
 ---
 
+### 🤏 Tiny Transformer (KI-ENNA)
+
+Train a **tiny decoder-only transformer live in the browser** — word-level
+tokenizer, token + positional embeddings, single-head causal self-attention and
+next-word prediction, with a live attention heatmap and loss curve. A SKaiNET
+port of the German educational page
+[KI-ENNA](https://statistical-thinking.de/ki-enna-transformer.html), built from
+scratch with the core NN DSL (no transformers library), with an English/German
+language toggle.
+
+<img src="TinyTransformer/docs/screenshots/wasm.png" alt="Tiny Transformer — live training with attention heatmap and loss curve" width="640" />
+
+📂 [`TinyTransformer/`](TinyTransformer/) · runs on Android · iOS · Desktop · Wasm
+
+---
+
 ### 💬 Kllama Demo
 
 A Qwen3 LLM **playground in the browser** — chat, completion, translation, tool
