@@ -15,17 +15,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "embedding-inversion"
 
-// Composite build: consume the local SKaiNET + SKaiNET-transformers checkouts directly
-// (source), so this example builds against the just-merged t5 / vec2text modules without
-// waiting for a published release. Gradle substitutes every `sk.ainet.core:*` and
-// `sk.ainet.transformers:*` dependency with the matching local project by coordinate.
+// SKaiNET core is consumed from Maven Central (0.36.0, pinned by the skainet BOM in
+// cli/build.gradle.kts) — no local ../../SKaiNET checkout needed.
 //
-// Both are included here at the root so transformers resolves `sk.ainet.core:*` from this
-// same composite — do NOT also set `useLocalSkainet` in the transformers build, or SKaiNET
-// would be included twice.
-// SKaiNET core modules auto-substitute (project name == published artifactId).
-includeBuild("../../SKaiNET")
-// The t5 / vec2text modules publish as `skainet-transformers-inference-*`, which differs
+// The t5 / vec2text modules are not yet published, so SKaiNET-transformers stays a composite
+// build. Its modules publish as `skainet-transformers-inference-*`, which differs
 // from their Gradle project names (`t5`, `vec2text`), so auto-substitution can't match —
 // map the coordinates to the local projects explicitly.
 includeBuild("../../SKaiNET-transformers") {
@@ -38,3 +32,4 @@ includeBuild("../../SKaiNET-transformers") {
 }
 
 include(":cli")
+include(":app")

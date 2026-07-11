@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.4.0"
+    kotlin("jvm")
     application
 }
 
@@ -13,14 +13,17 @@ kotlin {
 }
 
 dependencies {
-    // Substituted with the local ../../SKaiNET-transformers projects via the composite build.
+    // SKaiNET core: version aligned by the published BOM (0.36.0), resolved from Maven Central.
+    implementation(platform("sk.ainet:skainet-bom:0.36.0"))
+    implementation("sk.ainet.core:skainet-lang-core")
+    implementation("sk.ainet.core:skainet-backend-cpu")
+    implementation("sk.ainet.core:skainet-io-core")
+    implementation("sk.ainet.core:skainet-io-safetensors")
+
+    // t5 / vec2text: substituted with the local ../../SKaiNET-transformers projects (composite);
+    // the version here is ignored by the substitution.
     implementation("sk.ainet.transformers:skainet-transformers-inference-t5:0.35.0")
     implementation("sk.ainet.transformers:skainet-transformers-inference-vec2text:0.35.0")
-    // Substituted with the local ../../SKaiNET projects.
-    implementation("sk.ainet.core:skainet-lang-core:0.35.0")
-    implementation("sk.ainet.core:skainet-backend-cpu:0.35.0")
-    implementation("sk.ainet.core:skainet-io-core:0.35.0")
-    implementation("sk.ainet.core:skainet-io-safetensors:0.35.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")

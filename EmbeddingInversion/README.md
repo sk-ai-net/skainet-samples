@@ -59,22 +59,33 @@ The parity tests (below) compare against golden tensors dumped from the referenc
 `GtrEmbedderParityTest` needs token ids + the mean-pooled embedding from `gtr-t5-base`;
 `Vec2TextRoundTripTest` needs only the converted weights above.
 
-## Run it (composite build — no release needed)
+## Run it
 
-This project **`includeBuild`s the sibling `../../SKaiNET` and `../../SKaiNET-transformers`
-checkouts**, so it compiles against the local `t5` / `vec2text` source directly — no waiting
-for a published `skainet-transformers` release. Just put the converted weights in `models/` and:
+Put the converted weights in `models/`, then either:
 
 ```bash
+# Desktop GUI (Round trip + Vector arithmetic tabs):
+./gradlew :app:run
+
+# Or the CLI:
 ./gradlew :cli:run --args="jack morris is a phd student at cornell tech in new york city"
 ```
 
-Environment knobs: `VEC2TEXT_MODELS_DIR` (default `./models`), `VEC2TEXT_STEPS` (default 5).
+Environment knobs: `VEC2TEXT_MODELS_DIR` (default `../models` for the app, `./models` for the
+CLI), `VEC2TEXT_STEPS` (CLI, default 5).
 
-The composite requires the sibling checkouts at `../../SKaiNET` and `../../SKaiNET-transformers`
-and uses Gradle 9.6.1 (matching them). SKaiNET core modules auto-substitute; the two
-`skainet-transformers-inference-*` coordinates are mapped explicitly in `settings.gradle.kts`
-(their publish artifactId differs from the Gradle project name).
+### Build setup
+
+- **SKaiNET core** is consumed from Maven Central (**0.36.0**, pinned by the `sk.ainet:skainet-bom`
+  platform) — no local `SKaiNET` checkout needed.
+- **`t5` / `vec2text`** are not yet published, so **`SKaiNET-transformers` is a composite build**:
+  `settings.gradle.kts` `includeBuild`s `../../SKaiNET-transformers` and maps the two
+  `skainet-transformers-inference-*` coordinates to the local `:llm-inference:t5` / `:vec2text`
+  projects (their publish artifactId differs from the Gradle project name, so auto-substitution
+  can't match them). Uses Gradle 9.6.1 to match that build.
+
+Once `skainet-transformers` is released, drop the composite and depend on the published
+coordinates directly.
 
 > Reconstruction quality scales with correction `steps`; greedy + few steps + fp16 can produce
 > rough or `<unk>`-laden output on short inputs. Beam search and a decode KV-cache (much faster,
@@ -98,8 +109,8 @@ composite build. Planned tabs:
 | M1 T5 encoder + GTR embedder | ✅ verified (cosine 0.99999985 vs reference) |
 | M2 inversion (single-shot) | ✅ working end-to-end |
 | M3 corrector loop | ✅ working end-to-end |
-| M4 runnable CLI (composite build) | ✅ `./gradlew :cli:run` against local modules |
-| M4 Compose demo app | ⏳ next (reuses the same composite build) |
+| M4 runnable CLI (composite build) | ✅ `./gradlew :cli:run` |
+| M4 Compose desktop app | ✅ `./gradlew :app:run` — Round trip + Vector arithmetic tabs |
 | M5 beam search + KV-cache speedup | ⏳ follow-up |
 
 Current decoding is greedy with a no-KV-cache O(L²) loop — correct but slow on CPU. Beam search
