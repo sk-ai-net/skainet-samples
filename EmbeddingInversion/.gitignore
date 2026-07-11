@@ -1,0 +1,5 @@
+# Model weights + goldens are fetched/generated, not checked in (~1.1 GB+).
+models/
+.venv/
+scripts/*.log
+__pycache__/
