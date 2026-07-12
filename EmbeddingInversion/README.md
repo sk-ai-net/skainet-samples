@@ -76,30 +76,22 @@ CLI), `VEC2TEXT_STEPS` (CLI, default 5).
 
 ### Build setup
 
-- **SKaiNET core** is consumed from Maven Central (**0.36.0**, pinned by the `sk.ainet:skainet-bom`
-  platform) — no local `SKaiNET` checkout needed.
-- **`t5` / `vec2text`** are not yet published, so **`SKaiNET-transformers` is a composite build**:
-  `settings.gradle.kts` `includeBuild`s `../../SKaiNET-transformers` and maps the two
-  `skainet-transformers-inference-*` coordinates to the local `:llm-inference:t5` / `:vec2text`
-  projects (their publish artifactId differs from the Gradle project name, so auto-substitution
-  can't match them). Uses Gradle 9.6.1 to match that build.
-
-Once `skainet-transformers` is released, drop the composite and depend on the published
-coordinates directly.
+Everything is consumed from **Maven Central at 0.36.0** — no composite build, no local
+checkouts. SKaiNET core is version-aligned by the `sk.ainet:skainet-bom` platform; the
+inversion models come from `sk.ainet.transformers:skainet-transformers-inference-{t5,vec2text}`.
 
 > Reconstruction quality scales with correction `steps`; greedy + few steps + fp16 can produce
 > rough or `<unk>`-laden output on short inputs. Beam search and a decode KV-cache (much faster,
 > closer) are the M5 follow-ups.
 
-## Planned Compose Multiplatform demo (`app/`)
+## Compose desktop app (`app/`)
 
-A `GloVeEmbeddings`-style Compose app (desktop JVM first) is the next step, reusing the same
-composite build. Planned tabs:
+`./gradlew :app:run` opens a Compose for Desktop window with two tabs:
 
-- **Round trip** — type text → embed → show the 768-d vector → invert → compare original vs
-  reconstruction, with the per-step hypothesis + cosine sparkline.
+- **Round trip** — type text → embed → 768-d embedding strip → invert; the per-step hypotheses
+  stream in with a live cosine bar as each correction completes.
 - **Vector arithmetic** — interpolate two sentence embeddings with a slider and invert the
-  midpoint live (why inversion matters for privacy).
+  blend (text you never wrote, decoded from a vector — why inversion matters for privacy).
 
 ## Status
 
@@ -109,7 +101,7 @@ composite build. Planned tabs:
 | M1 T5 encoder + GTR embedder | ✅ verified (cosine 0.99999985 vs reference) |
 | M2 inversion (single-shot) | ✅ working end-to-end |
 | M3 corrector loop | ✅ working end-to-end |
-| M4 runnable CLI (composite build) | ✅ `./gradlew :cli:run` |
+| M4 runnable CLI | ✅ `./gradlew :cli:run` (Maven Central 0.36.0) |
 | M4 Compose desktop app | ✅ `./gradlew :app:run` — Round trip + Vector arithmetic tabs |
 | M5 beam search + KV-cache speedup | ⏳ follow-up |
 

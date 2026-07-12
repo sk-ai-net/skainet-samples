@@ -23,9 +23,9 @@ dependencies {
     implementation("sk.ainet.core:skainet-io-core")
     implementation("sk.ainet.core:skainet-io-safetensors")
 
-    // t5 / vec2text — substituted with the local SKaiNET-transformers projects (composite build).
-    implementation("sk.ainet.transformers:skainet-transformers-inference-t5:0.35.0")
-    implementation("sk.ainet.transformers:skainet-transformers-inference-vec2text:0.35.0")
+    // t5 / vec2text — published on Maven Central.
+    implementation("sk.ainet.transformers:skainet-transformers-inference-t5:0.36.0")
+    implementation("sk.ainet.transformers:skainet-transformers-inference-vec2text:0.36.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
