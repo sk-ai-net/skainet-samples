@@ -57,25 +57,64 @@ class Vec2TextEngine private constructor(
     /**
      * Invert [target] into text over [steps] correction rounds, calling [onStep] after the
      * initial hypothesis (step 0) and each correction. Returns the best-cosine hypothesis.
+     *
+     * [beamWidth] > 1 or [tokenBeams] > 1 enables beam search (better reconstructions, slower):
+     * [tokenBeams] is the T5 token-level beam per generation; [beamWidth] keeps that many
+     * hypotheses across correction rounds, ranked by cosine to [target].
      */
-    fun invert(target: Tensor<FP32, Float>, steps: Int, onStep: (Step) -> Unit): Step {
+    fun invert(
+        target: Tensor<FP32, Float>,
+        steps: Int,
+        beamWidth: Int = 1,
+        tokenBeams: Int = 1,
+        onStep: (Step) -> Unit,
+    ): Step =
+        if (beamWidth <= 1 && tokenBeams <= 1) invertGreedy(target, steps, onStep)
+        else invertBeam(target, steps, beamWidth.coerceAtLeast(1), tokenBeams.coerceAtLeast(1), onStep)
+
+    private fun invertGreedy(target: Tensor<FP32, Float>, steps: Int, onStep: (Step) -> Unit): Step {
         var hypIds = inversion.invert(target, maxLength = cfg.maxSeqLength)
         var hypText = decode(hypIds)
-        var cos = cosineOf(target, hypText)
-        var best = Step(0, hypText, cos)
+        var best = Step(0, hypText, cosineOf(target, hypText))
         onStep(best)
 
         for (s in 1..steps) {
-            val hypEmb = embed(hypText)
-            hypIds = corrector.correct(target, hypEmb, hypIds, maxLength = cfg.maxSeqLength)
+            hypIds = corrector.correct(target, embed(hypText), hypIds, maxLength = cfg.maxSeqLength)
             hypText = decode(hypIds)
-            cos = cosineOf(target, hypText)
-            val step = Step(s, hypText, cos)
+            val step = Step(s, hypText, cosineOf(target, hypText))
             onStep(step)
-            if (cos > best.cosine) best = step
+            if (step.cosine > best.cosine) best = step
         }
         return best
     }
+
+    /** Streaming sequence-level beam: emit the best-of-beam hypothesis after each round. */
+    private fun invertBeam(target: Tensor<FP32, Float>, steps: Int, beamWidth: Int, tokenBeams: Int, onStep: (Step) -> Unit): Step {
+        var beams = rank(target, inversion.invertBeam(target, maxOf(beamWidth, tokenBeams), cfg.maxSeqLength)).take(beamWidth)
+        var best = Step(0, beams.first().text, beams.first().cos)
+        onStep(best)
+
+        for (s in 1..steps) {
+            val pool = ArrayList<IntArray>()
+            for (b in beams) pool += corrector.correctBeam(target, embed(b.text), b.ids, tokenBeams, cfg.maxSeqLength)
+            beams = rank(target, pool).take(beamWidth)
+            val sb = beams.first()
+            val step = Step(s, sb.text, sb.cos)
+            onStep(step)
+            if (step.cosine > best.cosine) best = step
+        }
+        return best
+    }
+
+    private class Cand(val ids: IntArray, val text: String, val cos: Float)
+
+    private fun rank(target: Tensor<FP32, Float>, idsList: List<IntArray>): List<Cand> =
+        idsList.asSequence()
+            .map { ids -> decode(ids) to ids }
+            .distinctBy { it.first }
+            .map { (text, ids) -> Cand(ids, text, cosineOf(target, text)) }
+            .sortedByDescending { it.cos }
+            .toList()
 
     private fun cosineOf(target: Tensor<FP32, Float>, text: String): Float =
         Vec2TextInverter.cosine(target, embed(text))

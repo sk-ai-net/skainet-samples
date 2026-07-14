@@ -71,18 +71,36 @@ Put the converted weights in `models/`, then either:
 ./gradlew :cli:run --args="jack morris is a phd student at cornell tech in new york city"
 ```
 
-Environment knobs: `VEC2TEXT_MODELS_DIR` (default `../models` for the app, `./models` for the
-CLI), `VEC2TEXT_STEPS` (CLI, default 5).
+CLI environment knobs: `VEC2TEXT_MODELS_DIR` (default `../models` for the app, `./models` for
+the CLI), `VEC2TEXT_STEPS` (default 5), `VEC2TEXT_BEAM` (sequence beam width, default 1 = greedy),
+`VEC2TEXT_TOKEN_BEAMS` (T5 token-level beam, default = `VEC2TEXT_BEAM`). The GUI has a **Beam
+width** slider. Example:
+
+```bash
+VEC2TEXT_BEAM=3 ./gradlew :cli:run --args="jack morris is a phd student at cornell tech in new york city"
+# beam ×3 lifts cosine ~0.77 → ~0.82 vs greedy at one step (and is proportionally slower).
+```
 
 ### Build setup
 
-Everything is consumed from **Maven Central at 0.36.0** — no composite build, no local
-checkouts. SKaiNET core is version-aligned by the `sk.ainet:skainet-bom` platform; the
-inversion models come from `sk.ainet.transformers:skainet-transformers-inference-{t5,vec2text}`.
+SKaiNET core comes from **Maven Central 0.36.0** (aligned by the `sk.ainet:skainet-bom` platform).
+The inversion models `sk.ainet.transformers:skainet-transformers-inference-{t5,vec2text}` are used
+at **0.37.0** (adds beam search); until that lands on Central it's resolved from the **local Maven
+cache** (a scoped `mavenLocal`). To (re)publish it, from a `SKaiNET-transformers` checkout with
+`VERSION_NAME=0.37.0`:
 
-> Reconstruction quality scales with correction `steps`; greedy + few steps + fp16 can produce
-> rough or `<unk>`-laden output on short inputs. Beam search and a decode KV-cache (much faster,
-> closer) are the M5 follow-ups.
+```bash
+./gradlew :llm-bom:publishToMavenLocal :transformer-core:publishToMavenLocal \
+          :llm-core:publishToMavenLocal :llm-inference:t5:publishToMavenLocal \
+          :llm-inference:vec2text:publishToMavenLocal -PsignAllPublications=false
+```
+
+No composite build, no source checkouts. Once transformers 0.37.0 is on Central, drop the
+`mavenLocal` repository from `cli/` and `app/` `build.gradle.kts`.
+
+> Reconstruction quality scales with correction `steps` and beam width; greedy + few steps + fp16
+> can produce rough or `<unk>`-laden output on short inputs. A decode KV-cache (much faster,
+> compounding with beam) is the remaining M5 follow-up.
 
 ## Compose desktop app (`app/`)
 
@@ -103,7 +121,8 @@ inversion models come from `sk.ainet.transformers:skainet-transformers-inference
 | M3 corrector loop | ✅ working end-to-end |
 | M4 runnable CLI | ✅ `./gradlew :cli:run` (Maven Central 0.36.0) |
 | M4 Compose desktop app | ✅ `./gradlew :app:run` — Round trip + Vector arithmetic tabs |
-| M5 beam search + KV-cache speedup | ⏳ follow-up |
+| M5 beam search | ✅ `VEC2TEXT_BEAM` / GUI slider (transformers 0.37.0) |
+| M5 decode KV-cache speedup | ⏳ follow-up |
 
 Current decoding is greedy with a no-KV-cache O(L²) loop — correct but slow on CPU. Beam search
 and a KV cache (much faster, closer reconstructions) are the main follow-ups.

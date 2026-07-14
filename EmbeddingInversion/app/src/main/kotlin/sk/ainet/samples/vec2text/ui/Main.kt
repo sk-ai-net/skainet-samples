@@ -111,6 +111,7 @@ private fun RoundTripTab(engine: Vec2TextEngine) {
     val scope = rememberCoroutineScope()
     var text by remember { mutableStateOf("jack morris is a phd student at cornell tech in new york city") }
     var steps by remember { mutableStateOf(5f) }
+    var beam by remember { mutableStateOf(1f) }
     var running by remember { mutableStateOf(false) }
     var vector by remember { mutableStateOf<FloatArray?>(null) }
     val trace = remember { mutableStateListOf<Step>() }
@@ -118,13 +119,14 @@ private fun RoundTripTab(engine: Vec2TextEngine) {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         OutlinedTextField(text, { text = it }, Modifier.fillMaxWidth(), label = { Text("Text to embed & invert") })
         StepsSlider(steps) { steps = it }
+        BeamSlider(beam) { beam = it }
         RunButton("Embed → invert", running) {
             running = true; trace.clear(); vector = null
             scope.launch {
                 withContext(Dispatchers.Default) {
                     val target = engine.embed(text)
                     vector = engine.toFloats(target)
-                    engine.invert(target, steps.toInt()) { trace.add(it) }
+                    engine.invert(target, steps.toInt(), beam.toInt(), beam.toInt()) { trace.add(it) }
                 }
                 running = false
             }
@@ -173,6 +175,13 @@ private fun VectorArithmeticTab(engine: Vec2TextEngine) {
 private fun StepsSlider(steps: Float, onChange: (Float) -> Unit) {
     Text("Correction steps: ${steps.toInt()}")
     Slider(steps, onChange, valueRange = 0f..20f, steps = 19)
+}
+
+@Composable
+private fun BeamSlider(beam: Float, onChange: (Float) -> Unit) {
+    val w = beam.toInt()
+    Text("Beam width: ${if (w <= 1) "1 (greedy)" else "$w (slower, better)"}")
+    Slider(beam, onChange, valueRange = 1f..4f, steps = 2)
 }
 
 @Composable

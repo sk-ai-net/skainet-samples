@@ -33,6 +33,8 @@ fun main(args: Array<String>) = runBlocking {
         "jack morris is a phd student at cornell tech in new york city"
     }
     val steps = System.getenv("VEC2TEXT_STEPS")?.toIntOrNull() ?: 5
+    val beamWidth = System.getenv("VEC2TEXT_BEAM")?.toIntOrNull() ?: 1
+    val tokenBeams = System.getenv("VEC2TEXT_TOKEN_BEAMS")?.toIntOrNull() ?: beamWidth
 
     val required = listOf("tokenizer.json", "gtr_encoder.safetensors", "inversion.safetensors", "corrector.safetensors")
     val missing = required.filterNot { File(modelsDir, it).exists() }
@@ -66,9 +68,10 @@ fun main(args: Array<String>) = runBlocking {
             sp.decode(ids.filter { it != 0 && it != cfg.eosTokenId }.toIntArray())
     }
 
-    println("Inverting (≤$steps correction steps, greedy)…\n")
+    val mode = if (beamWidth > 1 || tokenBeams > 1) "beam ×$beamWidth, token-beams ×$tokenBeams" else "greedy"
+    println("Inverting (≤$steps correction steps, $mode)…\n")
     val result = Vec2TextInverter(embedder, inversion, corrector, codec)
-        .invert(text, numSteps = steps, maxLength = cfg.maxSeqLength)
+        .invert(text, numSteps = steps, maxLength = cfg.maxSeqLength, sequenceBeamWidth = beamWidth, tokenBeams = tokenBeams)
 
     println("original:      $text")
     println("reconstructed: ${result.text}")

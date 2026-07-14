@@ -7,6 +7,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    // Repositories are declared per-module (:cli, :app) so their own blocks apply; see there.
     repositories {
         google()
         mavenCentral()
