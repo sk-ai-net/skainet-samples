@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Internet only for the one-time model download from the Hugging Face
+         Hub; inference itself is fully on-device (demo runs in airplane mode). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".SkainetDemoApp"
+        android:label="SKaiNET Demo"
+        android:largeHeap="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <!-- NEON side: kernel auto-discovery finds skainet-backend-jni-cpu -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:resizeableActivity="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Scalar side: separate process, ScalarKernelProvider pinned in
+             SkainetDemoApp.onCreate before any matmul runs. KernelRegistry is
+             process-wide, so this half of the split-screen race stays scalar. -->
+        <activity
+            android:name=".ScalarActivity"
+            android:process=":scalar"
+            android:exported="false"
+            android:resizeableActivity="true"
+            android:taskAffinity="sk.ainet.demo.scalar" />
+    </application>
+</manifest>

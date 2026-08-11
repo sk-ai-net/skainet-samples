@@ -1,0 +1,36 @@
+# Toolchain versions mirror the SKaiNET repos' own catalogs (release/0.39.0)
+[versions]
+agp = "8.12.3"
+kotlin = "2.3.21"
+compose-bom = "2026.04.01"
+activity-compose = "1.12.4"
+lifecycle = "2.9.4"
+coroutines = "1.11.0"
+skainet = "0.39.1"              # official release from Maven Central
+skainet-transformers = "0.39.1" # lock-step release against engine 0.39.1
+
+[libraries]
+skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
+skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core" }
+skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu" }
+skainet-backend-jni-cpu = { module = "sk.ainet.core:skainet-backend-jni-cpu" }
+skainet-data-source = { module = "sk.ainet.core:skainet-data-source" }
+skainet-io-core = { module = "sk.ainet.core:skainet-io-core" }
+skainet-io-gguf = { module = "sk.ainet.core:skainet-io-gguf" }
+skainet-transformers-bom = { module = "sk.ainet.transformers:skainet-transformers-bom", version.ref = "skainet-transformers" }
+skainet-transformers-core = { module = "sk.ainet.transformers:skainet-transformers-core" }
+skainet-transformers-runtime-kllama = { module = "sk.ainet.transformers:skainet-transformers-runtime-kllama" }
+skainet-transformers-inference-llama = { module = "sk.ainet.transformers:skainet-transformers-inference-llama" }
+skainet-transformers-agent = { module = "sk.ainet.transformers:skainet-transformers-agent" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.1" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-ui = { module = "androidx.compose.ui:ui" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
+[plugins]
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
