@@ -1,5 +1,6 @@
 package sk.ainet.demo
 
+import android.os.SystemClock
 import android.util.Log
 import java.io.File
 import sk.ainet.apps.kllama.agent.generateUntilStop
@@ -15,7 +16,7 @@ import sk.ainet.lang.types.FP32
 import sk.ainet.models.llama.DecoderGgufWeightLoader
 import sk.ainet.models.llama.LlamaNetworkLoader
 
-private const val TAG = "SKAINET_DEMO"
+private val TAG = "SKAINET_DEMO_${ProcessTag.suffix}"
 
 /**
  * Loads a GGUF LLM and streams generated tokens — the whole integration.
@@ -36,17 +37,39 @@ class LlmEngine private constructor(
         // <|im_end|> immediately. Wrap in the ChatML envelope it was trained on.
         val templated = "<|im_start|>user\n$prompt<|im_end|>\n<|im_start|>assistant\n"
         val promptTokens = tokenizer.encode(templated)
-        Log.i(TAG, "prompt tokens=${promptTokens.size} eos=${tokenizer.eosTokenId}")
+        PerfLog.event(
+            "generate_start",
+            "promptTokens" to promptTokens.size,
+            "maxTokens" to maxTokens,
+            "eos" to tokenizer.eosTokenId,
+        )
+        val genStart = SystemClock.elapsedRealtime()
+        var firstTokenAt = 0L
+        var tokenCount = 0
         val result = runtime.generateUntilStop(
             prompt = promptTokens,
             maxTokens = maxTokens,
             eosTokenId = tokenizer.eosTokenId,
             temperature = 0.7f,
             onToken = { tokenId ->
-                Log.i(TAG, "token=$tokenId '${tokenizer.decode(tokenId)}'")
+                val now = SystemClock.elapsedRealtime()
+                if (tokenCount == 0) firstTokenAt = now
+                tokenCount++
+                Log.i(TAG, "token #$tokenCount id=$tokenId '${tokenizer.decode(tokenId)}' +${now - genStart}ms")
                 onToken(tokenizer.decode(tokenId))
             },
             decode = { tokenizer.decode(it) },
+        )
+        val genEnd = SystemClock.elapsedRealtime()
+        // Decode speed excludes prefill: measured from the first emitted token.
+        val decodeS = (genEnd - firstTokenAt) / 1000.0
+        PerfLog.event(
+            "generate_done",
+            "tokens" to tokenCount,
+            "ttftMs" to if (tokenCount > 0) firstTokenAt - genStart else null,
+            "totalMs" to genEnd - genStart,
+            "decodeTokPerSec" to if (tokenCount > 1 && decodeS > 0) "%.2f".format((tokenCount - 1) / decodeS) else null,
+            "textLen" to result.text.length,
         )
         Log.i(TAG, "result text len=${result.text.length}: '${result.text.take(200)}'")
         return result.text

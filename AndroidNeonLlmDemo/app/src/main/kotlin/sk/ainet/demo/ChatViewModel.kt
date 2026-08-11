@@ -109,8 +109,8 @@ class ChatViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 _state.value = _state.value.copy(busy = false, status = "Done — $tokenCount tokens, fully on-device")
                 // Hard evidence of which kernels actually ran this generation.
-                Log.i("SKAINET_DEMO", "providers=${KernelRegistry.availableNames()}")
-                Log.i("SKAINET_DEMO", KernelProfile.report())
+                Log.i("SKAINET_DEMO_${ProcessTag.suffix}", "providers=${KernelRegistry.availableNames()}")
+                Log.i("SKAINET_DEMO_${ProcessTag.suffix}", KernelProfile.report())
             } catch (e: Exception) {
                 _state.value = _state.value.copy(busy = false, status = "Error: ${e.message ?: e.javaClass.simpleName}")
             }
