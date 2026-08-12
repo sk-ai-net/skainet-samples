@@ -1,0 +1,5 @@
+.gradle/
+build/
+local.properties
+composeApp/src/commonMain/composeResources/files/*.gguf
+composeApp/src/androidMain/assets/*.gguf

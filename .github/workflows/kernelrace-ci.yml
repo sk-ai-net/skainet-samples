@@ -1,0 +1,63 @@
+name: KernelRace CI
+
+on:
+  pull_request:
+    paths:
+      - "KernelRace/**"
+      - "skainet-ui/**"
+      - ".github/workflows/kernelrace-ci.yml"
+  push:
+    branches:
+      - develop
+    paths:
+      - "KernelRace/**"
+      - "skainet-ui/**"
+      - ".github/workflows/kernelrace-ci.yml"
+
+concurrency:
+  group: kernelrace-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x KernelRace/gradlew
+
+      # composeApp's Kotlin compile tasks depend on the bundled GGUF (fetchModel — see
+      # composeApp/build.gradle.kts) even for a plain compile check, since Compose resource
+      # processing needs the file present. Cache it so only the first run per model version
+      # pays the ~145 MB download.
+      - name: Cache bundled GGUF model
+        uses: actions/cache@v4
+        with:
+          path: KernelRace/composeApp/src/commonMain/composeResources/files/SmolLM2-135M-Instruct-Q8_0.gguf
+          key: kernelrace-smollm2-q8_0-gguf-v1
+
+      # Unit tests on JVM + Android (no device), the Android debug APK assembly (proves the
+      # JNI kernel packaging), and a wasm compile check. Deliberately skips instrumented tests
+      # (needs a real device) to keep this a fast PR check.
+      - name: Build and test
+        working-directory: KernelRace
+        run: |
+          ./gradlew \
+            :shared:jvmTest \
+            :shared:testDebugUnitTest \
+            :composeApp:assembleDebug \
+            :shared:compileKotlinWasmJs \
+            :composeApp:compileKotlinWasmJs \
+            --console=plain

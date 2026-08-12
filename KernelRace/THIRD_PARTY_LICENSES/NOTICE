@@ -1,0 +1,9 @@
+This product bundles/downloads the SmolLM2-135M-Instruct language model (Q8_0
+quantization) released by Hugging Face (HuggingFaceTB), distributed under the
+Apache License 2.0 (see Apache-2.0.txt in this directory).
+
+Model source:  https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct
+GGUF build:    https://huggingface.co/unsloth/SmolLM2-135M-Instruct-GGUF
+GGUF file:     SmolLM2-135M-Instruct-Q8_0.gguf  (~145 MB)
+
+Attribution: HuggingFaceTB. See https://github.com/huggingface/smollm.
