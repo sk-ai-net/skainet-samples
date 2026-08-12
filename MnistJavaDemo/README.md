@@ -5,7 +5,7 @@ A CLI MNIST digit detector written in Java 21, demonstrating JVM interoperabilit
 ## Prerequisites
 
 - **Java 21+** (with preview features)
-- **SKaiNET 0.13.0** published to `mavenLocal` (`./gradlew publishToMavenLocal` from the SKaiNET root)
+- **SKaiNET 0.40.1** -- resolved directly from Maven Central, no local publish needed
 - **GGUF model file** -- a trained MNIST CNN model in GGUF format
 
 ## Usage
@@ -110,7 +110,7 @@ SKaiNET's `sequential` DSL uses `inline reified` type parameters -- a Kotlin com
 
 ## SKaiNET Dependencies
 
-All artifacts are consumed from `mavenLocal()` with the `-jvm` suffix (Kotlin Multiplatform JVM targets):
+All artifacts are consumed from Maven Central with the `-jvm` suffix (Kotlin Multiplatform JVM targets):
 
 - `skainet-lang-core-jvm` -- Tensor operations, Shape, DType
 - `skainet-lang-models-jvm` -- Module, sequential DSL
@@ -118,7 +118,7 @@ All artifacts are consumed from `mavenLocal()` with the `-jvm` suffix (Kotlin Mu
 - `skainet-data-transform-jvm` -- `Transform<I,O>`, `mnistPreprocessing()`, image transforms
 - `skainet-io-image-jvm` -- `PlatformBitmapImage` / image-to-tensor conversion
 - `skainet-io-gguf-jvm` -- GGUF model file reader
-- `skainet-data-basic-jvm` -- MNIST dataset loader
+- `skainet-data-simple-jvm` -- MNIST dataset loader
 - `skainet-compile-dag-jvm` -- Graph execution context for inference
 
 ## Running Tests
