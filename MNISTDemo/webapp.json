@@ -2,6 +2,7 @@
   "id": "mnistdemo",
   "name": "MNIST Demo",
   "description": "Handwritten digit classifier with in-app training using SKaiNET ML framework",
+  "platforms": ["android", "ios", "desktop", "wasm"],
   "distDirs": [
     "composeApp/build/kotlin-webpack/wasmJs/productionExecutable",
     "composeApp/build/processedResources/wasmJs/main"

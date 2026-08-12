@@ -1,0 +1,6 @@
+{
+  "id": "mnistjavademo",
+  "name": "MNIST Java Demo",
+  "description": "The same MNIST digit detector as a pure-Java CLI — proof of SKaiNET's first-class Java interop from a Kotlin Multiplatform engine.",
+  "platforms": ["cli", "java"]
+}
