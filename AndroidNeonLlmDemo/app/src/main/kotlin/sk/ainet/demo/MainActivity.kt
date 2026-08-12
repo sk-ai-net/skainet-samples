@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
     val state by viewModel.state.collectAsState()
-    var prompt by remember { mutableStateOf("Explain what a NEON instruction is, in two sentences.") }
+    var prompt by remember { mutableStateOf("Explain what a NEON (ARM) instruction is, in two sentences.") }
 
     Scaffold(
         topBar = {

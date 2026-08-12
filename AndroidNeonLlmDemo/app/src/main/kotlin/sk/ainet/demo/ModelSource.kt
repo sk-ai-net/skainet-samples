@@ -1,6 +1,7 @@
 package sk.ainet.demo
 
 import android.content.Context
+import android.os.SystemClock
 import java.io.File
 import java.io.FileNotFoundException
 import kotlinx.io.Buffer
@@ -29,9 +30,15 @@ object ModelSource {
     suspend fun resolve(context: Context, onProgress: (String) -> Unit): File {
         val dir = File(context.filesDir, "models").apply { mkdirs() }
         val target = File(dir, HF_FILE)
-        if (target.exists()) return target
+        if (target.exists()) {
+            PerfLog.event("model_cached", "file" to target.name, "fileMB" to target.length() / 1_000_000)
+            return target
+        }
 
-        copyFromAssetsOrNull(context, target)?.let { return it }
+        copyFromAssetsOrNull(context, target)?.let {
+            PerfLog.event("model_from_assets", "file" to it.name, "fileMB" to it.length() / 1_000_000)
+            return it
+        }
 
         return download(target, onProgress)
     }
@@ -55,13 +62,15 @@ object ModelSource {
         // retries instead of leaving a truncated GGUF behind.
         val tmp = File(target.parentFile, target.name + ".part")
         val fetcher = KtorRemoteDataSourceFetcher()
+        PerfLog.event("download_start", "url" to url)
+        val startedAt = SystemClock.elapsedRealtime()
+        var received = 0L
         try {
             val content = fetcher.fetch(url, headers)
             val totalMb = content.sizeBytes?.let { "%.0f".format(it / 1e6) } ?: "?"
             content.source.use { source ->
                 SystemFileSystem.sink(KotlinxPath(tmp.path)).buffered().use { sink ->
                     val chunk = Buffer()
-                    var received = 0L
                     var lastReported = -1L
                     while (true) {
                         val n = source.readAtMostTo(chunk, 1024 * 1024)
@@ -77,9 +86,22 @@ object ModelSource {
                 }
             }
             check(tmp.renameTo(target)) { "rename failed: $tmp -> $target" }
+            val durS = (SystemClock.elapsedRealtime() - startedAt) / 1000.0
+            PerfLog.event(
+                "download_done",
+                "fileMB" to received / 1_000_000,
+                "durMs" to (durS * 1000).toLong(),
+                "MBps" to if (durS > 0) "%.1f".format(received / 1e6 / durS) else null,
+            )
             return target
         } catch (e: Exception) {
             tmp.delete()
+            PerfLog.event(
+                "download_failed",
+                "receivedMB" to received / 1_000_000,
+                "durMs" to SystemClock.elapsedRealtime() - startedAt,
+                "error" to (e.message ?: e.javaClass.simpleName),
+            )
             throw e
         } finally {
             fetcher.close()

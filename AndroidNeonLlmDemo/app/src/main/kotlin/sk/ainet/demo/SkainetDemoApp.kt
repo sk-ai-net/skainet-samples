@@ -3,6 +3,7 @@ package sk.ainet.demo
 import android.app.Application
 import android.content.ComponentCallbacks2
 import android.os.Build
+import android.os.SystemClock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -46,6 +47,7 @@ class SkainetDemoApp : Application() {
         if (mode != kernelMode) {
             kernelMode = mode
             engine = null
+            PerfLog.event("kernel_mode_switch", "mode" to mode, "engineDropped" to true)
         }
     }
 
@@ -56,12 +58,25 @@ class SkainetDemoApp : Application() {
         } else {
             ServiceLoader.load(KernelProvider::class.java).forEach { KernelRegistry.register(it) }
         }
+        PerfLog.event(
+            "app_start",
+            "process" to if (isScalarProcess) "scalar" else "main",
+            "providers" to KernelRegistry.availableNames(),
+        )
     }
 
     suspend fun engine(onProgress: (String) -> Unit = {}): LlmEngine = mutex.withLock {
         engine ?: withContext(Dispatchers.IO) {
             val gguf = ModelSource.resolve(this@SkainetDemoApp, onProgress)
             onProgress("Loading model…")
+            val kernels = if (isScalarProcess || kernelMode == KernelMode.SCALAR) "scalar" else "neon"
+            PerfLog.event(
+                "model_load_start",
+                "file" to gguf.name,
+                "fileMB" to gguf.length() / 1_000_000,
+                "kernels" to kernels,
+            )
+            val loadStart = SystemClock.elapsedRealtime()
             LlmEngine.load(gguf).also {
                 if (isScalarProcess || kernelMode == KernelMode.SCALAR) {
                     // Android's platform ops factory re-registers ServiceLoader
@@ -74,6 +89,11 @@ class SkainetDemoApp : Application() {
                 }
                 // NEON mode needs no action: the load's context creation just
                 // re-registered the ServiceLoader providers (JNI at priority 100).
+                PerfLog.event(
+                    "model_load_done",
+                    "durMs" to SystemClock.elapsedRealtime() - loadStart,
+                    "kernels" to kernels,
+                )
             }
         }.also { engine = it }
     }
@@ -81,6 +101,7 @@ class SkainetDemoApp : Application() {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
+            PerfLog.event("trim_memory", "level" to level, "engineDropped" to (engine != null))
             engine = null // reloaded lazily on next generate
         }
     }

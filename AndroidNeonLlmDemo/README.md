@@ -19,6 +19,8 @@ at runtime per device.
   under the `SKAINET_DEMO` tag.
 - **Split-screen race**: one button launches a second process with the scalar
   provider pinned and starts both generations simultaneously.
+
+  ![Split-screen race: NEON at 44.7 tok/s vs scalar at 9.3 tok/s](docs/screenshots/split_race.png)
 - **Model delivery**: downloads the GGUF from the Hugging Face Hub on first
   run (SKaiNET's Ktor fetcher, streamed to disk with progress). To go fully
   offline instead, place `SmolLM2-135M-Instruct-Q8_0.gguf` in
