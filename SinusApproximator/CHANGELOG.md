@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.1] - 2026-08-12
+
+### Changed
+- Update to SKaiNET 0.40.1 from Maven Central.
+- Bump Kotlin to 2.4.10 to match the compiler SKaiNET's 0.40.1 klibs are built with.
+
 ## [0.34.0] - 2026-07-07
 
 ### Changed
