@@ -1,6 +1,6 @@
 [versions]
-skainet = "0.34.0"
-kotlin = "2.3.21"
+skainet = "0.40.1"
+kotlin = "2.4.10"
 kotlinx-coroutines = "1.10.2"
 kotlinx-io = "0.8.2"
 junit = "4.13.2"
@@ -11,7 +11,7 @@ skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core-jvm", version.re
 skainet-lang-models = { module = "sk.ainet.core:skainet-lang-models-jvm", version.ref = "skainet" }
 skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu-jvm", version.ref = "skainet" }
 skainet-data-api = { module = "sk.ainet.core:skainet-data-api-jvm", version.ref = "skainet" }
-skainet-data-simple = { module = "sk.ainet.core:skainet-data-basic-jvm", version.ref = "skainet" }
+skainet-data-simple = { module = "sk.ainet.core:skainet-data-simple-jvm", version.ref = "skainet" }
 skainet-data-transform = { module = "sk.ainet.core:skainet-data-transform-jvm", version.ref = "skainet" }
 skainet-io-core = { module = "sk.ainet.core:skainet-io-core-jvm", version.ref = "skainet" }
 skainet-io-image = { module = "sk.ainet.core:skainet-io-image-jvm", version.ref = "skainet" }

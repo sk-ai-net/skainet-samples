@@ -67,6 +67,19 @@ language toggle.
 
 ---
 
+### 🏁 Kernel Race
+
+On-device LLM chat accelerated by SKaiNET's hand-written ARM NEON kernels on Android, with a
+built-in **NEON vs scalar** A/B comparison — including a one-phone split-screen race. The same
+Kotlin codebase also runs on Desktop and in the browser, showing the other kernel tiers SKaiNET
+falls back to without NEON hardware.
+
+<img src="KernelRace/docs/screenshots/split_race.png" alt="Kernel Race — split-screen NEON vs scalar generation" width="640" />
+
+📂 [`KernelRace/`](KernelRace/) · runs on Android · Desktop · Wasm
+
+---
+
 ### 💬 Kllama Demo
 
 A Qwen3 LLM **playground in the browser** — chat, completion, translation, tool

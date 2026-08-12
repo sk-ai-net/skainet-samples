@@ -133,6 +133,7 @@ def find_webapp_configs(root_dir: Path, repo_url: str | None = None, branch: str
                 "description": meta.get("description", ""),
                 "screenshot": meta.get("screenshot"),
                 "distDirs": meta.get("distDirs", []),
+                "platforms": meta.get("platforms", ["web"]),
                 "sourceUrl": source_url,
                 "project_root": project_root
             })
@@ -461,7 +462,9 @@ def generate_html(apps: list, release_tag: str = "", base_url: str = "https://ex
             "description": app["description"],
             "screenshot": app.get("screenshot_url") or app.get("screenshot"),
             "sourceUrl": app.get("sourceUrl"),
-            "demoUrl": f"./{app['id']}/"
+            "platforms": app.get("platforms", ["web"]),
+            # Only samples that actually ship a web dist get a live demo link.
+            "demoUrl": f"./{app['id']}/" if app.get("distDirs") else None
         }
         for app in apps
     ], indent=2)
@@ -886,6 +889,27 @@ def generate_html(apps: list, release_tag: str = "", base_url: str = "https://ex
       line-height: 1.5;
     }}
 
+    .platform-chips {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin-top: 0.75rem;
+    }}
+
+    .platform-chip {{
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: capitalize;
+      color: hsl(var(--muted-foreground));
+      background-color: hsl(var(--muted) / 0.6);
+      border: 1px solid hsl(var(--border));
+      border-radius: 999px;
+      white-space: nowrap;
+    }}
+
     /* Card Footer - Stack on mobile, side-by-side on larger */
     .card-footer {{
       position: relative;
@@ -1078,10 +1102,17 @@ def generate_html(apps: list, release_tag: str = "", base_url: str = "https://ex
               ${{playIcon}}
               Try Demo
             </a>`
-          : `<button class="btn btn-primary" disabled>
-              ${{playIcon}}
-              Try Demo
-            </button>`;
+          : (project.sourceUrl
+              ? `<a href="${{escapeHtml(project.sourceUrl)}}" class="btn btn-outline" target="_blank" rel="noopener noreferrer">
+                  How to run
+                </a>`
+              : `<button class="btn btn-outline" disabled>
+                  How to run
+                </button>`);
+
+        const platformChips = (project.platforms || ['web']).map(p =>
+          `<span class="platform-chip">${{escapeHtml(p)}}</span>`
+        ).join('');
 
         return `
           <article class="project-card" data-project-id="${{escapeHtml(project.id)}}">
@@ -1095,6 +1126,7 @@ def generate_html(apps: list, release_tag: str = "", base_url: str = "https://ex
                 <span class="card-badge">${{escapeHtml(project.id)}}</span>
               </div>
               <p class="card-description">${{escapeHtml(project.description)}}</p>
+              <div class="platform-chips">${{platformChips}}</div>
             </div>
             <div class="card-footer">
               ${{sourceBtn}}

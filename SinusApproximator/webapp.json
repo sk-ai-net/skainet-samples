@@ -2,6 +2,7 @@
   "id": "sinusapproximator",
   "name": "Sinus Approximator",
   "description": "Sinus Approximator as web app",
+  "platforms": ["android", "ios", "desktop", "wasm"],
   "distDirs": [
     "composeApp/build/kotlin-webpack/wasmJs/productionExecutable",
     "composeApp/build/processedResources/wasmJs/main"

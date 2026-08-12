@@ -1,0 +1,60 @@
+[versions]
+agp = "8.12.3"
+android-compileSdk = "36"
+android-minSdk = "24"
+android-targetSdk = "36"
+androidx-activityCompose = "1.12.4"
+androidx-lifecycle = "2.9.6"
+composeHotReload = "1.0.0"
+# Pinned to 1.10.1 to match the shared :skainet-ui design system (included
+# build): a mismatched Compose pulls two Skiko versions onto the desktop
+# classpath, which crashes with UnsatisfiedLinkError
+# (getAdapterMaxTextureSize) at first render on macOS/Metal.
+composeMultiplatform = "1.10.1"
+# Must match the Kotlin version SKaiNET was built with.
+kotlin = "2.4.10"
+kotlinx-coroutines = "1.11.0"
+kotlinxIo = "0.9.0"
+# skainet-transformers has not released against the 0.40.x core line yet
+# (tops out at 0.39.1 on Maven Central), so this sample — like KllamaDemo —
+# stays one core version behind the transformers-free samples.
+skainet = "0.39.1"
+skainet-transformers = "0.39.1"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-uiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
+androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinxIo" }
+
+# SKaiNET core — BOM-governed
+skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
+skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core" }
+skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu" }
+# Hand-written ARM NEON kernels — Android/JVM JNI only, not wired into commonMain.
+skainet-backend-jni-cpu = { module = "sk.ainet.core:skainet-backend-jni-cpu" }
+skainet-data-source = { module = "sk.ainet.core:skainet-data-source" }
+skainet-io-core = { module = "sk.ainet.core:skainet-io-core" }
+skainet-io-gguf = { module = "sk.ainet.core:skainet-io-gguf" }
+
+# SKaiNET-transformers — BOM-governed
+skainet-transformers-bom = { module = "sk.ainet.transformers:skainet-transformers-bom", version.ref = "skainet-transformers" }
+skainet-transformers-core = { module = "sk.ainet.transformers:skainet-transformers-core" }
+skainet-transformers-inference-llama = { module = "sk.ainet.transformers:skainet-transformers-inference-llama" }
+skainet-transformers-runtime-kllama = { module = "sk.ainet.transformers:skainet-transformers-runtime-kllama" }
+skainet-transformers-agent = { module = "sk.ainet.transformers:skainet-transformers-agent" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

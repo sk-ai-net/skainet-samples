@@ -2,6 +2,7 @@
   "id": "gloveembeddings",
   "name": "GloVe Embeddings Explorer",
   "description": "Offline word-embedding explorer: nearest neighbours and vector analogies (king − man + woman ≈ queen), powered by SKaiNET",
+  "platforms": ["android", "ios", "desktop", "wasm"],
   "distDirs": [
     "app/build/kotlin-webpack/wasmJs/productionExecutable",
     "app/build/processedResources/wasmJs/main"

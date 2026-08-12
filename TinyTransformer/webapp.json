@@ -2,6 +2,7 @@
   "id": "tinytransformer",
   "name": "Tiny Transformer (KI-ENNA)",
   "description": "Train a tiny decoder-only transformer live in the browser — inspired by the KI-ENNA project (statistical-thinking.de)",
+  "platforms": ["android", "ios", "desktop", "wasm"],
   "distDirs": [
     "composeApp/build/kotlin-webpack/wasmJs/productionExecutable",
     "composeApp/build/processedResources/wasmJs/main"

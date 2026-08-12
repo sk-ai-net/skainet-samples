@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "sk.ainet.ui"
-version = "0.34.0"
+version = "0.40.1"
 
 kotlin {
     jvmToolchain(21)

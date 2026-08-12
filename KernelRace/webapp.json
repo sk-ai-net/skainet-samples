@@ -1,0 +1,14 @@
+{
+  "id": "kernelrace",
+  "name": "Kernel Race",
+  "description": "On-device LLM chat with a NEON-vs-scalar kernel race on Android; this web build runs SKaiNET's scalar fallback path.",
+  "platforms": ["android", "desktop", "wasm"],
+  "distDirs": [
+    "composeApp/build/dist/wasmJs/productionExecutable"
+  ],
+  "build": {
+    "command": "./gradlew :composeApp:wasmJsBrowserDistribution",
+    "description": "Builds the wasm browser distribution, including the bundled ~145 MB GGUF model"
+  },
+  "screenshot": "docs/screenshots/split_race.png"
+}
