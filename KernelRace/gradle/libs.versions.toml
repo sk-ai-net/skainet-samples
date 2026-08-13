@@ -44,6 +44,11 @@ ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "kto
 skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
 skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core" }
 skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu" }
+# Compile-time only: PanamaVectorKernelProvider implements KernelProvider (declared here),
+# so resolving .isAvailable() in Platform.jvm.kt needs this on the classpath even though it's
+# never referenced by name — skainet-backend-cpu depends on it as implementation-scoped, so
+# it isn't reachable transitively.
+skainet-backend-api = { module = "sk.ainet.core:skainet-backend-api" }
 # Hand-written ARM NEON kernels — Android/JVM JNI only, not wired into commonMain.
 skainet-backend-jni-cpu = { module = "sk.ainet.core:skainet-backend-jni-cpu" }
 skainet-data-source = { module = "sk.ainet.core:skainet-data-source" }

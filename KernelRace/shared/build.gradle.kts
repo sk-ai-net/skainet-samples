@@ -55,6 +55,9 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(libs.skainet.data.source)
+            // Transitive-only: lets Platform.jvm.kt resolve PanamaVectorKernelProvider's
+            // isAvailable() (declared on the KernelProvider interface from this module).
+            implementation(libs.skainet.backend.api)
         }
         iosMain.dependencies {
             // skainet-data-source is JVM-only (skainet.targets=jvm in its gradle.properties) —
