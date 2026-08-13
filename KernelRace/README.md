@@ -34,16 +34,24 @@ only, see below).
 - **~5-line integration**: `DecoderGgufWeightLoader` → `OptimizedLLMRuntime` →
   `generateUntilStop`, streaming tokens into Compose (see `shared/.../engine/LlmEngine.kt` and
   the per-platform `LlamaRuntimeBuilder.*.kt` actuals).
+- **How cheap adding iOS actually was**: the entire iOS-specific surface is ~200 lines across
+  four files (`shared/src/iosMain/`, `composeApp/src/iosMain/`) — and the one that matters,
+  `LlamaRuntimeBuilder.ios.kt`, is 36 lines and nearly a line-for-line copy of the JVM actual
+  (same `DecoderGgufWeightLoader` call, `PosixPreadRandomAccessSource` instead of
+  `JvmRandomAccessSource`). No SKaiNET code changed to make this work — the engine's KMP targets
+  and Apple `native-cinterop` kernels were already there. That's the actual point of this sample:
+  proof that SKaiNET apps aren't Android-first with iOS bolted on — iOS is just another
+  `expect`/`actual` pair.
 - **NEON | SCALAR switch** (Android only): two chips re-pin the kernel registry (engine reloads
   on the next run) — same APK, same model, full-device A/B with a live tok/s counter.
 - **Split-screen race** (Android only): one button launches a second process with the scalar
   provider pinned and starts both generations simultaneously.
 
   ![Split-screen race: NEON at 44.7 tok/s vs scalar at 9.3 tok/s](docs/screenshots/split_race.png)
-- **Cross-platform kernel tiers**: the same Kotlin `LlmEngine` runs on three different kernel
-  paths — Android's ARM NEON JNI kernels, Desktop's native-optimized file-based load, and Wasm's
-  in-memory FP32 fallback (browsers have no filesystem, so the model is bundled at build time
-  instead of downloaded).
+- **Cross-platform kernel tiers**: the same Kotlin `LlmEngine` runs on four different kernel
+  paths — Android's ARM NEON JNI kernels, iOS's Apple `native-cinterop` kernels, Desktop's
+  native-optimized file-based load, and Wasm's in-memory FP32 fallback (browsers have no
+  filesystem, so the model is bundled at build time instead of downloaded).
 - **Model delivery**: Android downloads the GGUF from the Hugging Face Hub on first run
   (SKaiNET's Ktor fetcher, streamed to disk with progress) or uses a bundled asset if present;
   Desktop downloads to a local cache dir; Wasm bundles the model into the production build via
