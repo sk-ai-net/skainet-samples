@@ -7,3 +7,9 @@ GGUF build:    https://huggingface.co/unsloth/SmolLM2-135M-Instruct-GGUF
 GGUF file:     SmolLM2-135M-Instruct-Q8_0.gguf  (~145 MB)
 
 Attribution: HuggingFaceTB. See https://github.com/huggingface/smollm.
+
+This product bundles coi-serviceworker (composeApp/src/wasmJsMain/resources/
+coi-serviceworker.js), (c) 2021 Guido Zuidhof and contributors, distributed
+under the MIT License (see MIT-coi-serviceworker.txt in this directory).
+
+Source: https://github.com/gzuidhof/coi-serviceworker

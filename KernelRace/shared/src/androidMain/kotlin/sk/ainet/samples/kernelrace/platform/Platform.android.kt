@@ -16,6 +16,8 @@ actual fun kernelTierLabel(): String =
 
 actual val supportsKernelRace: Boolean = true
 
+actual val currentSamplePlatform: SamplePlatform = SamplePlatform.ANDROID
+
 /** ":scalar" vs main process, read once from /proc/self/cmdline — splits log tags so the
  *  one-phone NEON-vs-scalar race can be watched as two separately filterable `adb logcat` streams. */
 private val processTag: String by lazy {

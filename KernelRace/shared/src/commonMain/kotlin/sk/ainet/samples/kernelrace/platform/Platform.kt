@@ -8,6 +8,18 @@ expect fun kernelTierLabel(): String
 /** Only Android can pin a JNI NEON provider vs a scalar one and race them side by side. */
 expect val supportsKernelRace: Boolean
 
+/** Every target this sample runs on — the fixed set the platform-chips row displays,
+ *  independent of which one is currently running (see [currentSamplePlatform]). */
+enum class SamplePlatform(val label: String) {
+    ANDROID("Android"),
+    DESKTOP("Desktop"),
+    WEB("Web"),
+    IOS("iOS"),
+}
+
+/** Which of [SamplePlatform] this process is actually running as — drives the highlighted chip. */
+expect val currentSamplePlatform: SamplePlatform
+
 /** Where the platform actually writes a log line — `adb logcat` on Android, stdout elsewhere. */
 internal expect fun platformLog(line: String)
 

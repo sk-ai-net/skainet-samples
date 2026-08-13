@@ -82,6 +82,8 @@ fun ChatScreen(
             Modifier.fillMaxSize().padding(padding)
                 .padding(horizontal = 16.dp, vertical = 4.dp)
         ) {
+            PlatformChips(Modifier.padding(bottom = 6.dp))
+
             kernelControls(state.busy, viewModel) { prompt }
 
             Text(
