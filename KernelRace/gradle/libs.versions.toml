@@ -15,6 +15,10 @@ composeMultiplatform = "1.10.1"
 kotlin = "2.4.10"
 kotlinx-coroutines = "1.11.0"
 kotlinxIo = "0.9.0"
+# Matches the engine repo's own pin (gradle/libs.versions.toml). Used directly by
+# IosModelProvider: skainet-data-source is JVM-only (KtorRemoteDataSourceFetcher lives in
+# its jvmMain), so the iOS download path talks to Ktor's Darwin engine on its own.
+ktorClientCore = "3.5.2"
 # skainet-transformers has not released against the 0.40.x core line yet
 # (tops out at 0.39.1 on Maven Central), so this sample — like KllamaDemo —
 # stays one core version behind the transformers-free samples.
@@ -33,11 +37,18 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinxIo" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientCore" }
 
 # SKaiNET core — BOM-governed
 skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
 skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core" }
 skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu" }
+# Compile-time only: PanamaVectorKernelProvider implements KernelProvider (declared here),
+# so resolving .isAvailable() in Platform.jvm.kt needs this on the classpath even though it's
+# never referenced by name — skainet-backend-cpu depends on it as implementation-scoped, so
+# it isn't reachable transitively.
+skainet-backend-api = { module = "sk.ainet.core:skainet-backend-api" }
 # Hand-written ARM NEON kernels — Android/JVM JNI only, not wired into commonMain.
 skainet-backend-jni-cpu = { module = "sk.ainet.core:skainet-backend-jni-cpu" }
 skainet-data-source = { module = "sk.ainet.core:skainet-data-source" }

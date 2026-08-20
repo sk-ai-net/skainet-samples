@@ -12,6 +12,9 @@ kotlin {
 
     jvm()
 
+    iosArm64()
+    iosSimulatorArm64()
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
@@ -52,6 +55,16 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(libs.skainet.data.source)
+            // Transitive-only: lets Platform.jvm.kt resolve PanamaVectorKernelProvider's
+            // isAvailable() (declared on the KernelProvider interface from this module).
+            implementation(libs.skainet.backend.api)
+        }
+        iosMain.dependencies {
+            // skainet-data-source is JVM-only (skainet.targets=jvm in its gradle.properties) —
+            // KtorRemoteDataSourceFetcher isn't reachable from iosMain, so IosModelProvider
+            // talks to Ktor's Darwin engine directly instead.
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
