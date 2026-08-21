@@ -3,9 +3,6 @@ package sk.ainet.samples.kernelrace
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
-import kernelrace.composeapp.generated.resources.Res
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlinx.browser.document
 import kotlinx.coroutines.CompletableDeferred
@@ -29,8 +26,12 @@ external fun createModuleWorker(url: String): JsAny
 external fun workerPostMessage(worker: JsAny, msg: String)
 
 @OptIn(ExperimentalWasmJsInterop::class)
-@JsFun("(worker, handler) => { worker.onmessage = (e) => handler(e.data); }")
+@JsFun("(worker, handler) => { worker.onmessage = (e) => handler(e.data); worker.onerror = (e) => console.error('[main] worker onerror:', e.message, e.filename, e.lineno); }")
 external fun installWorkerOnMessage(worker: JsAny, handler: (String) -> Unit)
+
+@OptIn(ExperimentalWasmJsInterop::class)
+@JsFun("(msg) => console.log('[main] ' + msg)")
+external fun mainLog(msg: String)
 
 /**
  * Bridges the model-loading/generation Worker (see webWorker/.../Main.kt for the protocol and
@@ -59,11 +60,13 @@ private class WorkerGenerativeEngine(private val worker: JsAny) : GenerativeEngi
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalEncodingApi::class, ExperimentalWasmJsInterop::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalWasmJsInterop::class)
 fun main() {
     ComposeViewport(document.body!!) {
         val viewModel = remember {
+            mainLog("creating worker from $WORKER_SCRIPT_URL")
             val worker = createModuleWorker(WORKER_SCRIPT_URL)
+            mainLog("worker object created (this does not confirm the script loaded)")
             val engine = WorkerGenerativeEngine(worker)
             var loadCompletion: CompletableDeferred<Unit>? = null
             var onProgress: ((String) -> Unit)? = null
@@ -76,21 +79,28 @@ fun main() {
                     raw.startsWith("DONE:") -> engine.currentCompletion?.complete(raw.removePrefix("DONE:"))
                     raw.startsWith("ERROR:") -> {
                         val message = raw.removePrefix("ERROR:")
+                        mainLog("ERROR received: $message")
                         loadCompletion?.completeExceptionally(RuntimeException(message))
                         engine.currentCompletion?.completeExceptionally(RuntimeException(message))
                     }
+                    else -> mainLog("unrecognized message prefix, ignoring: ${raw.take(30)}")
                 }
             }
 
             ChatViewModel(loadModel = { progress ->
+                // The worker fetches the GGUF itself (see webWorker/.../Main.kt) — the main
+                // thread never touches the model bytes. An earlier version read them here via
+                // Res.readBytes and shipped a base64 copy through postMessage, which held up to
+                // 4 copies of the ~145MB model alive across both threads at once and reliably
+                // crashed the renderer around 4GB; this doesn't.
+                mainLog("loadModel: start, posting LOAD")
                 onProgress = progress
-                progress("Downloading model bundle…")
-                val bytes = Res.readBytes("files/SmolLM2-135M-Instruct-Q8_0.gguf")
-                progress("Sending model to background worker…")
                 val ready = CompletableDeferred<Unit>()
                 loadCompletion = ready
-                workerPostMessage(worker, "MODEL:${Base64.encode(bytes)}")
+                workerPostMessage(worker, "LOAD")
+                mainLog("loadModel: LOAD message posted, awaiting READY")
                 ready.await()
+                mainLog("loadModel: ready.await() returned, returning engine")
                 engine
             })
         }
