@@ -1,9 +1,9 @@
 [versions]
-agp = "8.12.3"
-android-compileSdk = "36"
+agp = "9.3.1"
+android-compileSdk = "37"
 android-minSdk = "24"
 #noinspection EditedTargetSdkVersion
-android-targetSdk = "36"
+android-targetSdk = "37"
 androidx-activity = "1.10.1"
 androidx-activityCompose = "1.12.2"
 androidx-appcompat = "1.7.0"
@@ -13,11 +13,12 @@ androidx-espresso = "3.6.1"
 androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.2.1"
 composeHotReload = "1.0.0"
-# Pinned to 1.10.1 to match the shared :skainet-ui design system (included
-# build): a mismatched Compose pulls two Skiko versions onto the desktop
-# classpath, which crashes with UnsatisfiedLinkError
-# (getAdapterMaxTextureSize) at first render on macOS/Metal.
-composeMultiplatform = "1.10.1"
+# Must match the shared :skainet-ui design system (included build) exactly: a
+# mismatched Compose pulls two Skiko versions onto the desktop classpath,
+# which crashes with UnsatisfiedLinkError (getAdapterMaxTextureSize) at first
+# render on macOS/Metal. AGP must also match skainet-ui's — Gradle composite
+# builds reject mixed AGP versions.
+composeMultiplatform = "1.11.1"
 junit = "4.13.2"
 kotlin = "2.4.10"
 kotlinx-coroutines = "1.10.2"
@@ -53,6 +54,7 @@ skainet-io-onnx = { module = "sk.ainet.core:skainet-io-onnx", version.ref = "ska
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

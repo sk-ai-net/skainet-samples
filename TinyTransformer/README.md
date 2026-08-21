@@ -49,7 +49,7 @@ This sample is a Kotlin/SKaiNET port of the German educational page
 | Desktop | `./gradlew :composeApp:run` |
 | Web (Wasm) | `./gradlew :composeApp:wasmJsBrowserDevelopmentRun` |
 | Web (JS)   | `./gradlew :composeApp:jsBrowserDevelopmentRun` |
-| Android | `./gradlew :composeApp:assembleDebug` |
+| Android | `./gradlew :androidApp:assembleDebug` |
 | iOS     | open `/iosApp` in Xcode and run |
 | Tests   | `./gradlew :shared:jvmTest` |
 

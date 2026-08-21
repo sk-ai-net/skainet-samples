@@ -1,14 +1,27 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
 }
 
 kotlin {
     jvmToolchain(21)
 
-    androidTarget()
+    android {
+        namespace = "sk.ainet.samples.kernelrace.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
+
+        // Runs commonTest on the JVM against Android stubs (testDebugUnitTest) — CI relies on
+        // this; the new AGP-KMP-library plugin doesn't wire it up by default like com.android.library did.
+        withHostTest {}
+    }
 
     jvm()
 
@@ -81,16 +94,4 @@ tasks.withType<Test>().configureEach {
         "--enable-preview",
         "-Dskainet.cpu.vector.enabled=true",
     )
-}
-
-android {
-    namespace = "sk.ainet.samples.kernelrace.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
 }

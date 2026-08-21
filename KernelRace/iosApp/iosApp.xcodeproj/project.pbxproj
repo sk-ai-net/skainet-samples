@@ -31,7 +31,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1A00000000000000000030 /* Root */ = {
+		1A00000000000000000030 = {
 			isa = PBXGroup;
 			children = (
 				1A00000000000000000031 /* iosApp */,
@@ -102,7 +102,7 @@
 				en,
 				Base,
 			);
-			mainGroup = 1A00000000000000000030 /* Root */;
+			mainGroup = 1A00000000000000000030;
 			productRefGroup = 1A00000000000000000032 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -140,7 +140,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode";
 		};
 /* End PBXShellScriptBuildPhase section */
 

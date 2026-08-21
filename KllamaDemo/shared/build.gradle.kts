@@ -2,13 +2,17 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
 }
 
 kotlin {
     jvmToolchain(21)
 
-    androidTarget()
+    android {
+        namespace = "sk.ainet.apps.kllama.chat.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
 
     iosArm64()
     iosSimulatorArm64()
@@ -79,16 +83,4 @@ tasks.withType<Test>().configureEach {
         "--enable-preview",
         "-Dskainet.cpu.vector.enabled=true",
     )
-}
-
-android {
-    namespace = "sk.ainet.apps.kllama.chat.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
 }

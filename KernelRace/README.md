@@ -66,13 +66,13 @@ only, see below).
 Real ARM64 hardware shows the point best (an x86 emulator falls back to scalar):
 
 ```sh
-./gradlew :composeApp:installDebug
+./gradlew :androidApp:installDebug
 ```
 
 Tap **Generate on-device** — the model (~145 MB) downloads on first use. Then flip the
 **SCALAR** chip and generate again to see the difference, or tap **Race against scalar** for the
 side-by-side version. To go fully offline, place `SmolLM2-135M-Instruct-Q8_0.gguf` in
-`composeApp/src/androidMain/assets/` before building.
+`androidApp/src/main/assets/` before building.
 
 Reference numbers (SmolLM2-135M Q8_0, SKaiNET 0.39.1): ~6.4× decode-kernel throughput NEON vs
 scalar on a Pixel 8a.
@@ -141,17 +141,23 @@ KernelRace/
 │       ├── jvmMain/           # DesktopModelProvider, file-based LlamaRuntimeBuilder actual
 │       ├── iosMain/           # IosModelProvider (Ktor/Darwin), pread-based LlamaRuntimeBuilder actual
 │       └── wasmJsMain/        # Bytes-only LlamaRuntimeBuilder actual (no filesystem)
-└── composeApp/                 # Compose Multiplatform UI + platform entry points
-    └── src/
-        ├── commonMain/         # App/ChatScreen (skainet-ui themed), kernelControls slot
-        ├── androidMain/        # KernelRaceApp (kernel pinning), race UI, manifest
-        ├── jvmMain/            # Desktop window entry point
-        ├── iosMain/            # MainViewController — entry point called from iosApp/
-        └── wasmJsMain/         # Browser entry point + bundled model resource
+├── composeApp/                 # Compose Multiplatform UI — a KMP library (Android, jvm, iOS, wasmJs)
+│   └── src/
+│       ├── commonMain/         # App/ChatScreen (skainet-ui themed), kernelControls slot
+│       ├── jvmMain/            # Desktop window entry point
+│       ├── iosMain/            # MainViewController — entry point called from iosApp/
+│       └── wasmJsMain/         # Browser entry point + bundled model resource
+├── androidApp/                 # Android application entry point — depends on composeApp + shared
+│   └── src/main/               # KernelRaceApp (kernel pinning), race UI, manifest
 iosApp/                         # Xcode project shell embedding composeApp's Kotlin/Native framework
 ```
 
+AGP 9 no longer allows `com.android.application` inside a Kotlin Multiplatform module, so the
+Android entry point is a separate `:androidApp` module that depends on `:composeApp` (for `App()`)
+and `:shared`; `:composeApp` itself is now a KMP library on its Android axis
+(`com.android.kotlin.multiplatform.library`), same shape on jvm/iOS/wasmJs as before.
+
 The race mechanics (multi-process kernel pinning, `KernelRegistry`, the split-screen button) are
-entirely Android-specific and live in `composeApp/androidMain`. Common code only sees a
+entirely Android-specific and live in `androidApp/src/main`. Common code only sees a
 `kernelControls` composable slot and a `GenerativeEngine` interface, which is what makes
 `shared`'s `ChatViewModel` unit-testable with a fake on every target — see `shared/src/*Test/`.

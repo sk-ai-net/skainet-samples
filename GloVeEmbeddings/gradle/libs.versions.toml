@@ -7,21 +7,22 @@ kotlin = "2.4.10"
 # sk.ainet.core:* artifact so individual libraries are declared without versions.
 skainet = "0.40.1"
 
-# Compose Multiplatform + Android. Pinned to 1.10.1 to match the shared
-# :skainet-ui design system (included build): a mismatched Compose pulls two
-# Skiko versions onto the desktop classpath — newer skiko-awt classes against an
+# Compose Multiplatform + Android. Must match the shared :skainet-ui design
+# system (included build) exactly: a mismatched Compose pulls two Skiko
+# versions onto the desktop classpath — newer skiko-awt classes against an
 # older native runtime — which crashes with UnsatisfiedLinkError
-# (getAdapterMaxTextureSize) at first render on macOS/Metal.
-agp = "8.12.3"
-composeMultiplatform = "1.10.1"
+# (getAdapterMaxTextureSize) at first render on macOS/Metal. AGP must also
+# match skainet-ui's: Gradle composite builds reject mixed AGP versions.
+agp = "9.3.1"
+composeMultiplatform = "1.11.1"
 androidx-lifecycle = "2.9.6"
 androidx-activityCompose = "1.12.2"
 # Provides the Swing Dispatchers.Main for the desktop (JVM) target; must match
 # the kotlinx-coroutines-core version on the classpath (1.11.0).
 coroutines = "1.11.0"
-android-compileSdk = "36"
+android-compileSdk = "37"
 android-minSdk = "24"
-android-targetSdk = "36"
+android-targetSdk = "37"
 
 [libraries]
 skainet-bom = { module = "sk.ainet:skainet-bom", version.ref = "skainet" }
@@ -36,5 +37,6 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

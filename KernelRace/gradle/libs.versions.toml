@@ -1,20 +1,19 @@
 [versions]
-agp = "8.12.3"
-android-compileSdk = "36"
+agp = "9.3.1"
+android-compileSdk = "37"
 android-minSdk = "24"
-android-targetSdk = "36"
-androidx-activityCompose = "1.12.4"
-androidx-lifecycle = "2.9.6"
-composeHotReload = "1.0.0"
-# Pinned to 1.10.1 to match the shared :skainet-ui design system (included
-# build): a mismatched Compose pulls two Skiko versions onto the desktop
-# classpath, which crashes with UnsatisfiedLinkError
-# (getAdapterMaxTextureSize) at first render on macOS/Metal.
-composeMultiplatform = "1.10.1"
+android-targetSdk = "37"
+androidx-activityCompose = "1.13.0"
+androidx-lifecycle = "2.11.0"
+composeHotReload = "1.2.0"
+# Must match the shared :skainet-ui design system's own pin (included build) — a mismatch
+# pulls two Skiko versions onto the desktop classpath, which crashes with
+# UnsatisfiedLinkError (getAdapterMaxTextureSize) at first render on macOS/Metal.
+composeMultiplatform = "1.11.1"
 # Must match the Kotlin version SKaiNET was built with.
 kotlin = "2.4.10"
 kotlinx-coroutines = "1.11.0"
-kotlinxIo = "0.9.0"
+kotlinxIo = "0.9.1"
 # Matches the engine repo's own pin (gradle/libs.versions.toml). Used directly by
 # IosModelProvider: skainet-data-source is JVM-only (KtorRemoteDataSourceFetcher lives in
 # its jvmMain), so the iOS download path talks to Ktor's Darwin engine on its own.
@@ -22,8 +21,8 @@ ktorClientCore = "3.5.2"
 # skainet-transformers has not released against the 0.40.x core line yet
 # (tops out at 0.39.1 on Maven Central), so this sample — like KllamaDemo —
 # stays one core version behind the transformers-free samples.
-skainet = "0.39.1"
-skainet-transformers = "0.39.1"
+skainet = "0.40.1"
+skainet-transformers = "0.40.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -64,7 +63,7 @@ skainet-transformers-agent = { module = "sk.ainet.transformers:skainet-transform
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeHotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "composeHotReload" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
