@@ -7,6 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- The embedded app.html iframe needs cross-origin isolation (SharedArrayBuffer) for
+       Compose's Wasm/Skiko multi-threaded renderer, but isolation is scoped to the whole
+       browsing context group: an iframe can only be isolated if its top-level document is
+       isolated too, regardless of what app.html itself does. This portal page IS that
+       top-level document, so it needs the same coi-serviceworker shim. See THIRD_PARTY_LICENSES/NOTICE. -->
+  <script src="coi-serviceworker.js"></script>
   <style>
     :root {
       --background: 220 20% 4%;
@@ -194,7 +200,7 @@
     </div>
   </header>
 
-  <iframe src="app.html" class="app-frame" title="Kernel Race"></iframe>
+  <iframe src="app.html" class="app-frame" title="Kernel Race" allow="cross-origin-isolated"></iframe>
 
   <footer class="footer">
     &copy; 2026 SKaiNET. All rights reserved. &middot;
