@@ -33,5 +33,6 @@ dependencyResolutionManagement {
 // KllamaDemo / TinyTransformer examples.
 includeBuild("../skainet-ui")
 
+include(":androidApp")
 include(":composeApp")
 include(":shared")

@@ -56,8 +56,8 @@ jobs:
         run: |
           ./gradlew \
             :shared:jvmTest \
-            :shared:testDebugUnitTest \
-            :composeApp:assembleDebug \
+            :shared:testAndroidHostTest \
+            :androidApp:assembleDebug \
             :shared:compileKotlinWasmJs \
             :composeApp:compileKotlinWasmJs \
             --console=plain
