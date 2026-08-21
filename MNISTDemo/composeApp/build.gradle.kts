@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
@@ -12,7 +12,19 @@ plugins {
 kotlin {
     jvmToolchain(21)
 
-    androidTarget()
+    // Android app entry point (both MainActivity variants, manifest, launcher icons/assets)
+    // lives in :androidApp — AGP 9 no longer allows 'com.android.application' directly in a KMP
+    // module. This module is now a plain KMP library on the Android axis; :androidApp depends on
+    // it for App() and the shared UI.
+    android {
+        namespace = "sk.ainet.app.sample.mnist.library"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
+    }
 
     jvm("desktop")
 
@@ -38,10 +50,6 @@ kotlin {
     sourceSets {
         val desktopMain by getting
 
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-        }
         commonMain.dependencies {
 
             implementation(compose.runtime)
@@ -70,46 +78,10 @@ kotlin {
     }
 }
 
-android {
-    namespace = "sk.ainet.app.sample.mnist"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
-    defaultConfig {
-        applicationId = "sk.ai.net.samples.kmp.mnist.demo"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    buildFeatures {
-        compose = true
-    }
-    dependencies {
-        debugImplementation(compose.uiTooling)
-    }
-}
-
-dependencies {
-    //testImplementation(libs.junit.jupiter)
-    //testImplementation(libs.junit)
+// androidApp now lives in a separate module and needs to reach the generated Res
+// accessor (used by MainActivity) — default visibility is internal to this module.
+compose.resources {
+    publicResClass = true
 }
 
 compose.desktop {

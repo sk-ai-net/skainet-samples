@@ -1,15 +1,18 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
 }
 
 kotlin {
     jvmToolchain(21)
 
-    androidTarget()
+    android {
+        namespace = "sk.ai.net.client.shared"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
 
     jvm()
 
@@ -39,10 +42,6 @@ kotlin {
             // SKaiNET backend
             implementation(libs.skainet.backend.cpu)
 
-            // SKaiNET data
-            implementation(libs.skainet.data.api)
-            implementation(libs.skainet.data.simple)
-
             // SKaiNET I/O
             implementation(libs.skainet.io.core)
             implementation(libs.skainet.io.gguf)
@@ -53,18 +52,6 @@ kotlin {
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.coroutines.test)
         }
-    }
-}
-
-android {
-    namespace = "sk.ai.net.client.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
     }
 }
 
