@@ -22,7 +22,7 @@ Kotlin"), plus an offline Compose Multiplatform app that explores word vectors.
 ./gradlew :glove:runDemo                      # the article pipeline, end to end (JVM)
 ./gradlew :app:run                            # desktop UI (needs a display)
 ./gradlew :app:wasmJsBrowserDevelopmentRun    # web UI in the browser
-./gradlew :app:assembleDebug                  # Android APK (needs an Android SDK)
+./gradlew :androidApp:assembleDebug           # Android APK (needs an Android SDK)
 ```
 
 iOS targets are declared and build on a macOS host (`:app` produces a `GloVeApp` framework);

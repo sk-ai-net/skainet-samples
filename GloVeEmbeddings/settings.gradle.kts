@@ -39,3 +39,4 @@ includeBuild("../skainet-ui")
 
 include(":glove")
 include(":app")
+include(":androidApp")
