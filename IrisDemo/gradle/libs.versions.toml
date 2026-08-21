@@ -1,0 +1,22 @@
+[versions]
+skainet = "0.40.1"
+kotlin = "2.4.10"
+kotlinx-coroutines = "1.10.2"
+kotlinx-io = "0.8.2"
+junit = "4.13.2"
+
+[libraries]
+# SKaiNET (JVM artifacts)
+skainet-lang-core = { module = "sk.ainet.core:skainet-lang-core-jvm", version.ref = "skainet" }
+skainet-lang-models = { module = "sk.ainet.core:skainet-lang-models-jvm", version.ref = "skainet" }
+skainet-backend-cpu = { module = "sk.ainet.core:skainet-backend-cpu-jvm", version.ref = "skainet" }
+skainet-lang-dag = { module = "sk.ainet.core:skainet-lang-dag-jvm", version.ref = "skainet" }
+skainet-compile-dag = { module = "sk.ainet.core:skainet-compile-dag-jvm", version.ref = "skainet" }
+
+# Kotlin runtime (needed for SKaiNET interop)
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core-jvm", version.ref = "kotlinx-io" }
+
+# Testing
+junit = { module = "junit:junit", version.ref = "junit" }
