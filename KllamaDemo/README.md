@@ -64,7 +64,7 @@ stream at ~1-3 tok/s on CPU.
 ### Android
 
 ```shell
-./gradlew :composeApp:assembleDebug
+./gradlew :androidApp:assembleDebug
 ```
 
 The debug APK includes the 400 MB model in `assets/` — too large for
